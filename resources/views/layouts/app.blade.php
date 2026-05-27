@@ -7,6 +7,9 @@
 
         <title>{{ config('app.name', 'PrComet') }}</title>
 
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+        <link rel="alternate icon" href="/favicon.ico">
+
         {{-- Geist Sans + Geist Mono. Contemporary geometric grotesk used by
              modern SaaS surfaces; pairs cleanly with slate neutrals. --}}
         <link rel="preconnect" href="https://fonts.bunny.net">

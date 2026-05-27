@@ -8,6 +8,9 @@
         <title>PrComet — Find the journalists who'll publish your story</title>
         <meta name="description" content="PrComet continuously analyzes thousands of publications, podcasts, and newsletters to surface the writers most likely to engage with your story — and tells you exactly why they're a fit.">
 
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+        <link rel="alternate icon" href="/favicon.ico">
+
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=geist:400,500,600,700|geist-mono:400,500&display=swap" rel="stylesheet" />
 
@@ -24,7 +27,7 @@
                 <a href="/" class="flex items-center gap-2.5">
                     <span class="grid place-items-center h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 shadow-sm">
                         <svg viewBox="0 0 24 24" class="h-4 w-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3 21l9-18 9 18" /><path d="M7 13h10" />
+                            <path d="M4 20 C 8 16, 12 6, 19 7" /><circle cx="19" cy="7" r="2.2" fill="currentColor" stroke="none" />
                         </svg>
                     </span>
                     <span class="font-semibold text-slate-900 tracking-tight">PrComet</span>
@@ -507,7 +510,7 @@
             <div class="max-w-7xl mx-auto px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
                 <div class="flex items-center gap-2">
                     <span class="grid place-items-center h-6 w-6 rounded-md bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600">
-                        <svg viewBox="0 0 24 24" class="h-3 w-3 text-white" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l9-18 9 18" /><path d="M7 13h10" /></svg>
+                        <svg viewBox="0 0 24 24" class="h-3 w-3 text-white" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 C 8 16, 12 6, 19 7" /><circle cx="19" cy="7" r="2.2" fill="currentColor" stroke="none" /></svg>
                     </span>
                     <span class="text-sm font-medium text-slate-700">PrComet</span>
                 </div>
