@@ -9,7 +9,7 @@
         <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
             <span class="grid place-items-center h-7 w-7 rounded-md bg-brand-600">
                 <svg viewBox="0 0 24 24" class="h-4 w-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 20 C 8 16, 12 6, 19 7" /><circle cx="19" cy="7" r="2.2" fill="currentColor" stroke="none" />
+                    <path d="M5 18 L 19 6" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-dasharray="2 3" opacity="0.45" /><circle cx="5" cy="18" r="1.7" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none" /><circle cx="19" cy="6" r="2.4" fill="currentColor" stroke="none" />
                 </svg>
             </span>
             <span class="font-semibold text-slate-900">PrComet</span>
@@ -39,7 +39,7 @@
             <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5">
                 <span class="grid place-items-center h-8 w-8 rounded-lg bg-brand-600 shadow-sm">
                     <svg viewBox="0 0 24 24" class="h-5 w-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M4 20 C 8 16, 12 6, 19 7" /><circle cx="19" cy="7" r="2.2" fill="currentColor" stroke="none" />
+                        <path d="M5 18 L 19 6" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-dasharray="2 3" opacity="0.45" /><circle cx="5" cy="18" r="1.7" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none" /><circle cx="19" cy="6" r="2.4" fill="currentColor" stroke="none" />
                     </svg>
                 </span>
                 <span class="font-semibold text-slate-900 tracking-tight">PrComet</span>
