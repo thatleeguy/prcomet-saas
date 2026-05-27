@@ -4,42 +4,37 @@
             <x-authentication-card-logo />
         </x-slot>
 
-        <div class="mb-4 text-sm text-gray-600">
-            {{ __('Before continuing, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
+        <div class="mb-8">
+            <h1 class="text-2xl font-semibold text-slate-900 tracking-tight">Verify your email.</h1>
+            <p class="text-sm text-slate-500 mt-2 leading-relaxed">
+                We sent a verification link to your inbox. Click it to continue. If it didn't arrive, we'll happily resend.
+            </p>
         </div>
 
         @if (session('status') == 'verification-link-sent')
-            <div class="mb-4 font-medium text-sm text-green-600">
-                {{ __('A new verification link has been sent to the email address you provided in your profile settings.') }}
+            <div class="mb-6 font-medium text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md px-3 py-2">
+                A new verification link is on its way.
             </div>
         @endif
 
-        <div class="mt-4 flex items-center justify-between">
-            <form method="POST" action="{{ route('verification.send') }}">
+        <form method="POST" action="{{ route('verification.send') }}" class="mb-6">
+            @csrf
+            <x-button class="w-full justify-center !bg-slate-900 hover:!bg-slate-800 !px-4 !py-2.5 !text-sm !normal-case !tracking-normal">
+                {{ __('Resend verification email') }}
+            </x-button>
+        </form>
+
+        <div class="flex items-center justify-between text-sm pt-6 border-t border-slate-100">
+            <a href="{{ route('profile.show') }}" class="text-slate-500 hover:text-slate-900 transition-colors">
+                Edit profile
+            </a>
+
+            <form method="POST" action="{{ route('logout') }}">
                 @csrf
-
-                <div>
-                    <x-button type="submit">
-                        {{ __('Resend Verification Email') }}
-                    </x-button>
-                </div>
+                <button type="submit" class="text-slate-500 hover:text-slate-900 transition-colors">
+                    Sign out
+                </button>
             </form>
-
-            <div>
-                <a
-                    href="{{ route('profile.show') }}"
-                    class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                    {{ __('Edit Profile') }}</a>
-
-                <form method="POST" action="{{ route('logout') }}" class="inline">
-                    @csrf
-
-                    <button type="submit" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ms-2">
-                        {{ __('Log Out') }}
-                    </button>
-                </form>
-            </div>
         </div>
     </x-authentication-card>
 </x-guest-layout>

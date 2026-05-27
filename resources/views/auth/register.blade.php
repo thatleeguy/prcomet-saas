@@ -4,9 +4,14 @@
             <x-authentication-card-logo />
         </x-slot>
 
+        <div class="mb-8">
+            <h1 class="text-2xl font-semibold text-slate-900 tracking-tight">Create your account.</h1>
+            <p class="text-sm text-slate-500 mt-2">It takes a minute. We'll review and activate within a business day.</p>
+        </div>
+
         <x-validation-errors class="mb-4" />
 
-        <form method="POST" action="{{ route('register') }}">
+        <form method="POST" action="{{ route('register') }}" class="space-y-4">
             @csrf
 
             <div>
@@ -14,31 +19,31 @@
                 <x-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
             </div>
 
-            <div class="mt-4">
-                <x-label for="email" value="{{ __('Email') }}" />
+            <div>
+                <x-label for="email" value="{{ __('Work email') }}" />
                 <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
             </div>
 
-            <div class="mt-4">
+            <div>
                 <x-label for="password" value="{{ __('Password') }}" />
                 <x-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
             </div>
 
-            <div class="mt-4">
-                <x-label for="password_confirmation" value="{{ __('Confirm Password') }}" />
+            <div>
+                <x-label for="password_confirmation" value="{{ __('Confirm password') }}" />
                 <x-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
             </div>
 
             @if (Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature())
-                <div class="mt-4">
+                <div>
                     <x-label for="terms">
-                        <div class="flex items-center">
-                            <x-checkbox name="terms" id="terms" required />
+                        <div class="flex items-start gap-2">
+                            <x-checkbox name="terms" id="terms" required class="mt-0.5" />
 
-                            <div class="ms-2">
+                            <div class="text-sm text-slate-600 leading-relaxed">
                                 {!! __('I agree to the :terms_of_service and :privacy_policy', [
-                                        'terms_of_service' => '<a target="_blank" href="'.route('terms.show').'" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">'.__('Terms of Service').'</a>',
-                                        'privacy_policy' => '<a target="_blank" href="'.route('policy.show').'" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">'.__('Privacy Policy').'</a>',
+                                        'terms_of_service' => '<a target="_blank" href="'.route('terms.show').'" class="text-slate-900 hover:text-brand-700 underline underline-offset-2">'.__('Terms of Service').'</a>',
+                                        'privacy_policy' => '<a target="_blank" href="'.route('policy.show').'" class="text-slate-900 hover:text-brand-700 underline underline-offset-2">'.__('Privacy Policy').'</a>',
                                 ]) !!}
                             </div>
                         </div>
@@ -46,15 +51,16 @@
                 </div>
             @endif
 
-            <div class="flex items-center justify-end mt-4">
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                    {{ __('Already registered?') }}
-                </a>
-
-                <x-button class="ms-4">
-                    {{ __('Register') }}
+            <div class="pt-2">
+                <x-button class="w-full justify-center !bg-slate-900 hover:!bg-slate-800 !px-4 !py-2.5 !text-sm !normal-case !tracking-normal">
+                    {{ __('Create account') }}
                 </x-button>
             </div>
         </form>
+
+        <p class="mt-8 pt-6 border-t border-slate-100 text-sm text-slate-500 text-center">
+            Already have an account?
+            <a href="{{ route('login') }}" class="font-medium text-slate-900 hover:text-brand-700 transition-colors">Sign in</a>
+        </p>
     </x-authentication-card>
 </x-guest-layout>

@@ -477,24 +477,85 @@
         {{-- ─────────────────────────────────────────────────────────────
               DEMO REQUEST
           ───────────────────────────────────────────────────────────── --}}
-        <section id="request-demo" class="py-20 lg:py-28 bg-slate-50 border-t border-slate-200/70 relative overflow-hidden">
+        <section id="request-demo" class="py-24 lg:py-32 bg-slate-50 border-t border-slate-200/70 relative overflow-hidden">
+            {{-- Rich gradient backdrop (the conversion moment deserves the same care
+                 as the hero). Multiple blobs at higher intensity than other sections. --}}
             <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
-                <div class="absolute top-0 right-0 h-96 w-96 rounded-full bg-gradient-to-br from-indigo-200/40 to-fuchsia-200/40 blur-3xl translate-x-1/3 -translate-y-1/3"></div>
+                <div class="absolute -top-32 left-1/4 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-indigo-300/40 to-fuchsia-300/30 blur-3xl"></div>
+                <div class="absolute -bottom-32 right-1/4 h-[500px] w-[500px] rounded-full bg-gradient-to-tr from-violet-300/30 to-indigo-300/40 blur-3xl"></div>
             </div>
 
-            <div class="relative max-w-3xl mx-auto px-6 lg:px-8">
-                <div class="text-center mb-10">
-                    <p class="text-xs font-semibold text-indigo-600 uppercase tracking-wider mb-3">Request a demo</p>
-                    <h2 class="text-3xl lg:text-4xl font-semibold text-slate-900 tracking-tight">
-                        See PrComet against your content.
+            <div class="relative max-w-6xl mx-auto px-6 lg:px-8">
+                {{-- Hero copy --}}
+                <div class="max-w-3xl text-center mx-auto mb-14 lg:mb-16">
+                    <p class="text-xs font-semibold text-indigo-600 uppercase tracking-wider mb-4">Request a demo</p>
+                    <h2 class="text-4xl lg:text-5xl font-semibold text-slate-900 tracking-tight [text-wrap:balance]">
+                        See PrComet running on your content.
                     </h2>
-                    <p class="text-lg text-slate-600 mt-4 leading-relaxed max-w-xl mx-auto">
-                        We'll ingest your last few press releases, run them through the engine, and show you the briefs we'd surface for your team. Takes about 15 minutes.
+                    <p class="text-lg text-slate-600 mt-5 leading-relaxed [text-wrap:balance]">
+                        In 15 minutes we'll ingest your last three releases, run them through the engine, and walk you through the briefs we'd surface for your team.
                     </p>
                 </div>
 
-                <div class="rounded-2xl bg-white border border-slate-200 shadow-xl p-6 lg:p-8">
-                    @livewire('landing.demo-request-form')
+                {{-- Two-column: promise + trust signal on the left, form on the right --}}
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-12 items-start">
+
+                    {{-- LEFT: what to expect --}}
+                    <div class="lg:col-span-2 space-y-10 lg:pt-2">
+                        <div>
+                            <h3 class="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-6">What happens next</h3>
+                            <ol class="space-y-6">
+                                <li class="flex gap-4">
+                                    <span class="grid place-items-center h-8 w-8 rounded-full bg-slate-900 text-white text-xs font-semibold shrink-0 ring-4 ring-white shadow-sm">1</span>
+                                    <div>
+                                        <div class="text-sm font-semibold text-slate-900">You submit the form</div>
+                                        <p class="text-sm text-slate-600 mt-1 leading-relaxed">A real person reads it. No drip campaigns, no "Hi {firstname}" sequence.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-4">
+                                    <span class="grid place-items-center h-8 w-8 rounded-full bg-slate-900 text-white text-xs font-semibold shrink-0 ring-4 ring-white shadow-sm">2</span>
+                                    <div>
+                                        <div class="text-sm font-semibold text-slate-900">We send you real briefs within 24 hours</div>
+                                        <p class="text-sm text-slate-600 mt-1 leading-relaxed">Actual opportunities surfaced from your last three releases. Rationale, suggested angles, the works.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-4">
+                                    <span class="grid place-items-center h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 text-white text-xs font-semibold shrink-0 ring-4 ring-white shadow-md">3</span>
+                                    <div>
+                                        <div class="text-sm font-semibold text-slate-900">15-minute walkthrough</div>
+                                        <p class="text-sm text-slate-600 mt-1 leading-relaxed">If the briefs land, we'll set up your team and you're off.</p>
+                                    </div>
+                                </li>
+                            </ol>
+                        </div>
+
+                        {{-- Trust signal --}}
+                        <div class="pt-8 border-t border-slate-200/80">
+                            <div class="flex items-start gap-3">
+                                <div class="relative shrink-0">
+                                    <div class="grid place-items-center h-11 w-11 rounded-full bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 text-white text-sm font-semibold ring-2 ring-white shadow">L</div>
+                                    <span class="absolute -bottom-0.5 -right-0.5 grid place-items-center h-4 w-4 rounded-full bg-emerald-500 ring-2 ring-white">
+                                        <svg class="h-2.5 w-2.5 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                    </span>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-semibold text-slate-900">Personally reviewed</div>
+                                    <p class="text-sm text-slate-600 mt-0.5 leading-relaxed">Every request gets a human reply within one business day. Promise.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- RIGHT: the form, elevated and signaled with the brand gradient --}}
+                    <div class="lg:col-span-3">
+                        <div class="relative rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden">
+                            {{-- Thin gradient stripe across the top, same vocabulary as the dashboard hero --}}
+                            <div class="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600"></div>
+                            <div class="p-6 lg:p-8">
+                                @livewire('landing.demo-request-form')
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

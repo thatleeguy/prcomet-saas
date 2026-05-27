@@ -4,31 +4,37 @@
             <x-authentication-card-logo />
         </x-slot>
 
-        <div class="mb-4 text-sm text-gray-600">
-            {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
+        <div class="mb-8">
+            <h1 class="text-2xl font-semibold text-slate-900 tracking-tight">Reset your password.</h1>
+            <p class="text-sm text-slate-500 mt-2">Enter your email and we'll send a link to set a new one.</p>
         </div>
 
         @session('status')
-            <div class="mb-4 font-medium text-sm text-green-600">
+            <div class="mb-4 font-medium text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md px-3 py-2">
                 {{ $value }}
             </div>
         @endsession
 
         <x-validation-errors class="mb-4" />
 
-        <form method="POST" action="{{ route('password.email') }}">
+        <form method="POST" action="{{ route('password.email') }}" class="space-y-4">
             @csrf
 
-            <div class="block">
+            <div>
                 <x-label for="email" value="{{ __('Email') }}" />
                 <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
             </div>
 
-            <div class="flex items-center justify-end mt-4">
-                <x-button>
-                    {{ __('Email Password Reset Link') }}
+            <div>
+                <x-button class="w-full justify-center !bg-slate-900 hover:!bg-slate-800 !px-4 !py-2.5 !text-sm !normal-case !tracking-normal">
+                    {{ __('Send reset link') }}
                 </x-button>
             </div>
         </form>
+
+        <p class="mt-8 pt-6 border-t border-slate-100 text-sm text-slate-500 text-center">
+            Remembered it?
+            <a href="{{ route('login') }}" class="font-medium text-slate-900 hover:text-brand-700 transition-colors">Sign in</a>
+        </p>
     </x-authentication-card>
 </x-guest-layout>
