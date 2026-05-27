@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
+        <title>PrComet — Find the journalists who'll publish your story</title>
+        <meta name="description" content="PrComet continuously analyzes thousands of publications, podcasts, and newsletters to surface the writers most likely to engage with your story — and tells you exactly why they're a fit.">
+
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=geist:400,500,600,700|geist-mono:400,500&display=swap" rel="stylesheet" />
+
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @livewireStyles
+    </head>
+    <body class="font-sans antialiased text-slate-900 bg-white">
+
+        {{-- ─────────────────────────────────────────────────────────────
+              NAV
+          ───────────────────────────────────────────────────────────── --}}
+        <header class="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-slate-200/60">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
+                <a href="/" class="flex items-center gap-2.5">
+                    <span class="grid place-items-center h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 shadow-sm">
+                        <svg viewBox="0 0 24 24" class="h-4 w-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 21l9-18 9 18" /><path d="M7 13h10" />
+                        </svg>
+                    </span>
+                    <span class="font-semibold text-slate-900 tracking-tight">PrComet</span>
+                </a>
+
+                <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
+                    <a href="#how" class="hover:text-slate-900 transition-colors">How it works</a>
+                    <a href="#brief" class="hover:text-slate-900 transition-colors">The brief</a>
+                    <a href="#for-whom" class="hover:text-slate-900 transition-colors">Who it's for</a>
+                </nav>
+
+                <div class="flex items-center gap-2">
+                    @auth
+                        <a href="{{ url('/dashboard') }}" class="hidden sm:inline-flex items-center px-3.5 py-1.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors">
+                            Open dashboard →
+                        </a>
+                    @else
+                        <a href="{{ route('login') }}" class="hidden sm:inline-flex items-center px-3.5 py-1.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors">
+                            Sign in
+                        </a>
+                    @endauth
+                    <a href="#request-demo" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium transition-colors">
+                        Request a demo
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        {{-- ─────────────────────────────────────────────────────────────
+              HERO
+          ───────────────────────────────────────────────────────────── --}}
+        <section class="relative overflow-hidden">
+            <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
+                <div class="absolute top-0 right-0 h-[600px] w-[600px] rounded-full bg-gradient-to-br from-indigo-200/40 to-fuchsia-200/40 blur-3xl translate-x-1/3 -translate-y-1/3"></div>
+                <div class="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-gradient-to-tr from-violet-200/30 to-indigo-200/30 blur-3xl -translate-x-1/3"></div>
+            </div>
+
+            <div class="relative max-w-7xl mx-auto px-6 lg:px-8 pt-16 lg:pt-24 pb-16 lg:pb-24 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                <div class="space-y-7">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-xs font-medium text-indigo-700">
+                        <span class="relative flex h-1.5 w-1.5">
+                            <span class="absolute inline-flex h-full w-full rounded-full bg-indigo-500 opacity-60 animate-ping"></span>
+                            <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-500"></span>
+                        </span>
+                        Early access · invitation only
+                    </div>
+
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-semibold text-slate-900 tracking-tight leading-[1.05] [text-wrap:balance]">
+                        Find the writers who'll publish your story.
+                    </h1>
+
+                    <p class="text-lg text-slate-600 leading-relaxed max-w-xl">
+                        PrComet reads thousands of articles, podcasts, and newsletters every week so you don't have to. We surface the journalists, hosts, and analysts most likely to engage with your story — and we tell you exactly why each one is a fit.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <a href="#request-demo" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-medium text-sm transition-colors shadow-sm">
+                            Request a demo
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6" /></svg>
+                        </a>
+                        <a href="#how" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-medium text-sm transition-colors">
+                            See how it works
+                        </a>
+                    </div>
+
+                    <div class="flex items-center gap-6 pt-2 text-xs text-slate-500">
+                        <span class="flex items-center gap-1.5">
+                            <svg class="h-3.5 w-3.5 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Discovery, not automation
+                        </span>
+                        <span class="flex items-center gap-1.5">
+                            <svg class="h-3.5 w-3.5 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Citations on every claim
+                        </span>
+                    </div>
+                </div>
+
+                {{-- Hero mockup: two-step flow showing the actual product loop.
+                     Press release goes in → PrComet surfaces the matching writer.
+                     Content on white cards so it's actually readable; gradient
+                     reserved for backdrop, avatar, score, and connector. --}}
+                <div class="relative lg:pl-8">
+                    {{-- Soft gradient backdrop --}}
+                    <div class="absolute -inset-6 bg-gradient-to-br from-indigo-300/40 via-violet-300/40 to-fuchsia-300/40 rounded-[2.5rem] blur-3xl" aria-hidden="true"></div>
+
+                    <div class="relative space-y-3">
+                        {{-- STEP 1: Your press release --}}
+                        <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-md">
+                            <div class="flex items-center gap-2 mb-2.5">
+                                <div class="grid place-items-center h-7 w-7 rounded-lg bg-slate-100 text-slate-500">
+                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 12h6M9 16h6M9 8h6M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z" /></svg>
+                                </div>
+                                <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">When you publish</div>
+                                <span class="ml-auto text-[10px] text-slate-400">2h ago</span>
+                            </div>
+                            <div class="text-sm font-medium text-slate-900 leading-snug">
+                                "Aurelian intersects 12.4 g/t Au over 28m at Big Sky"
+                            </div>
+                            <div class="text-xs text-slate-500 mt-1">Aurelian Gold · Press release</div>
+                        </div>
+
+                        {{-- Gradient connector --}}
+                        <div class="flex justify-center -my-1.5 relative z-10">
+                            <div class="grid place-items-center h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 shadow-lg ring-4 ring-white">
+                                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 5v14M19 12l-7 7-7-7" /></svg>
+                            </div>
+                        </div>
+
+                        {{-- STEP 2: PrComet surfaces the match --}}
+                        <div class="bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden">
+                            {{-- Header strip --}}
+                            <div class="px-5 py-2.5 bg-gradient-to-r from-indigo-50 via-violet-50 to-fuchsia-50 border-b border-slate-100 flex items-center gap-2">
+                                <span class="relative flex h-2 w-2">
+                                    <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-60 animate-ping"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                </span>
+                                <span class="text-xs font-semibold text-slate-700">PrComet surfaces your top match</span>
+                            </div>
+
+                            <div class="p-5 lg:p-6">
+                                {{-- Author identity + score --}}
+                                <div class="flex items-start gap-3 mb-5">
+                                    <div class="grid place-items-center h-12 w-12 rounded-full bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 text-white font-bold text-sm ring-2 ring-white shadow shrink-0">RS</div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="font-semibold text-slate-900 leading-tight">Robert Sinclair</div>
+                                        <div class="text-xs text-slate-500 mt-0.5">Senior reporter · Mining.com</div>
+                                    </div>
+                                    <div class="text-right shrink-0">
+                                        <div class="text-3xl font-bold tabular leading-none">
+                                            <span class="bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 bg-clip-text text-transparent">87</span><span class="text-xl text-slate-400 font-semibold">%</span>
+                                        </div>
+                                        <div class="inline-flex items-center gap-1 mt-1.5 text-[10px] uppercase tracking-wider text-emerald-700 font-semibold">
+                                            <span class="h-1 w-1 rounded-full bg-emerald-500"></span>
+                                            High fit
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- The "why" — short and punchy --}}
+                                <div class="space-y-3">
+                                    <div>
+                                        <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Why he's a fit</div>
+                                        <p class="text-sm text-slate-700 leading-relaxed">
+                                            Wrote about Walker Lane gold 4 days ago. Your drill result extends his thesis. He has a track record of follow-up coverage on companies he's flagged.
+                                        </p>
+                                    </div>
+
+                                    <div class="pt-3 border-t border-slate-100">
+                                        <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Pitch this</div>
+                                        <p class="text-sm text-slate-700 leading-relaxed">
+                                            Send the intercept summary + offer your CEO for a 15-min call. Keep it factual.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <button class="mt-5 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-medium text-sm transition-colors shadow-sm">
+                                    Open full brief
+                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6" /></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {{-- ─────────────────────────────────────────────────────────────
+              HOW IT WORKS — 3 steps with mini mockups
+          ───────────────────────────────────────────────────────────── --}}
+        <section id="how" class="bg-slate-50 border-y border-slate-200/70 py-20 lg:py-28">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <div class="max-w-2xl">
+                    <p class="text-xs font-semibold text-indigo-600 uppercase tracking-wider mb-3">How it works</p>
+                    <h2 class="text-3xl lg:text-4xl font-semibold text-slate-900 tracking-tight">
+                        Three things happen. None of them are pitching at scale.
+                    </h2>
+                    <p class="text-lg text-slate-600 mt-4 leading-relaxed">
+                        PrComet sits between your content and the universe of publications. It reads on your behalf, finds the fits, and hands them to you with the reasoning intact.
+                    </p>
+                </div>
+
+                <div class="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                    {{-- Step 1: feed-connection mock --}}
+                    <div class="space-y-5">
+                        <div class="flex items-center gap-3">
+                            <span class="grid place-items-center h-8 w-8 rounded-lg bg-indigo-100 text-indigo-700 font-semibold text-sm">01</span>
+                            <h3 class="text-lg font-semibold text-slate-900">Connect your content</h3>
+                        </div>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            Point us at your RSS feed — press releases, blog posts, product updates. We watch it for new publications and use them as the trigger for discovery.
+                        </p>
+
+                        <div class="rounded-xl bg-white border border-slate-200 shadow-sm p-4 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="text-xs font-medium text-slate-500">Press feed</div>
+                                <span class="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700">
+                                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                                    Connected
+                                </span>
+                            </div>
+                            <div class="font-mono text-xs text-slate-700 bg-slate-50 rounded px-2.5 py-1.5 truncate border border-slate-100">
+                                https://yourcompany.com/news/rss.xml
+                            </div>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-slate-500">Last polled</span>
+                                <span class="tabular text-slate-700 font-medium">12 min ago</span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
+                                <span class="text-slate-500">Releases ingested</span>
+                                <span class="tabular text-slate-900 font-semibold">47</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Step 2: live corpus --}}
+                    <div class="space-y-5">
+                        <div class="flex items-center gap-3">
+                            <span class="grid place-items-center h-8 w-8 rounded-lg bg-violet-100 text-violet-700 font-semibold text-sm">02</span>
+                            <h3 class="text-lg font-semibold text-slate-900">We do the reading</h3>
+                        </div>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            Every article, podcast episode, and newsletter post in your industry gets read and indexed. We build a rolling profile of each writer's stance, topics, and track record.
+                        </p>
+
+                        <div class="rounded-xl bg-white border border-slate-200 shadow-sm p-4">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="text-xs font-medium text-slate-500">Live corpus</div>
+                                <span class="inline-flex items-center gap-1 text-[10px] font-medium text-slate-500">
+                                    <span class="relative flex h-1.5 w-1.5">
+                                        <span class="absolute inline-flex h-full w-full rounded-full bg-violet-500 opacity-60 animate-ping"></span>
+                                        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-violet-500"></span>
+                                    </span>
+                                    Analyzing
+                                </span>
+                            </div>
+                            <ul class="space-y-2">
+                                @foreach ([
+                                    ['MN', 'Nevada drill season heats up', 'from-indigo-500 to-violet-600'],
+                                    ['CI', 'Macro setup for gold in H2 2026', 'from-violet-500 to-fuchsia-600'],
+                                    ['MS', 'Why Nevada gold is underpriced', 'from-blue-500 to-indigo-600'],
+                                ] as $item)
+                                    <li class="flex items-center gap-2.5">
+                                        <div class="grid place-items-center h-6 w-6 rounded text-[10px] font-semibold text-white bg-gradient-to-br {{ $item[2] }} shrink-0">{{ $item[0] }}</div>
+                                        <span class="text-xs text-slate-700 truncate flex-1">{{ $item[1] }}</span>
+                                        <svg class="h-3 w-3 text-emerald-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                    </li>
+                                @endforeach
+                            </ul>
+                            <div class="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                                <span class="text-slate-500">Items analyzed today</span>
+                                <span class="tabular text-slate-900 font-semibold">142</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Step 3: ranked matches --}}
+                    <div class="space-y-5">
+                        <div class="flex items-center gap-3">
+                            <span class="grid place-items-center h-8 w-8 rounded-lg bg-fuchsia-100 text-fuchsia-700 font-semibold text-sm">03</span>
+                            <h3 class="text-lg font-semibold text-slate-900">You see the matches</h3>
+                        </div>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            For each new piece of your content, we surface the writers most likely to engage — ranked by fit, with the rationale, citations, and a suggested angle.
+                        </p>
+
+                        <div class="rounded-xl bg-white border border-slate-200 shadow-sm p-4">
+                            <div class="text-xs font-medium text-slate-500 mb-3">Top matches</div>
+                            <ul class="space-y-2.5">
+                                @foreach ([
+                                    ['Robert Sinclair', 'Mining.com', '87%', 'text-emerald-700'],
+                                    ['Kerry Lutz', 'Mining Stock Education', '81%', 'text-emerald-700'],
+                                    ['Brent Cook', 'Exploration Insights', '76%', 'text-indigo-700'],
+                                ] as $m)
+                                    <li class="flex items-center gap-3 py-1.5">
+                                        <div class="grid place-items-center h-7 w-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-[10px] font-semibold shrink-0">{{ strtoupper(substr($m[0], 0, 1).explode(' ', $m[0])[1][0]) }}</div>
+                                        <div class="min-w-0 flex-1">
+                                            <div class="text-xs font-medium text-slate-900 truncate">{{ $m[0] }}</div>
+                                            <div class="text-[10px] text-slate-500 truncate">{{ $m[1] }}</div>
+                                        </div>
+                                        <span class="text-xs font-semibold tabular {{ $m[3] }}">{{ $m[2] }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {{-- ─────────────────────────────────────────────────────────────
+              THE BRIEF — main feature showcase
+          ───────────────────────────────────────────────────────────── --}}
+        <section id="brief" class="py-20 lg:py-28">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+                <div class="space-y-6 order-2 lg:order-1">
+                    <p class="text-xs font-semibold text-indigo-600 uppercase tracking-wider">The brief</p>
+                    <h2 class="text-3xl lg:text-4xl font-semibold text-slate-900 tracking-tight">
+                        Every match comes with reasoning.
+                    </h2>
+                    <p class="text-lg text-slate-600 leading-relaxed">
+                        Lists of journalists aren't useful — anyone can sell you a database. PrComet shows you <em class="font-medium text-slate-900">why</em> a specific writer is the right person for a specific story, with citations linking back to their actual work.
+                    </p>
+
+                    <ul class="space-y-4 pt-2">
+                        <li class="flex gap-3">
+                            <span class="grid place-items-center h-6 w-6 rounded-md bg-indigo-100 text-indigo-700 shrink-0 mt-0.5">
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            </span>
+                            <div>
+                                <div class="text-sm font-semibold text-slate-900">A rationale, not a hunch</div>
+                                <p class="text-sm text-slate-600 leading-relaxed mt-0.5">
+                                    "Sinclair wrote a Nevada gold piece 4 days ago. Your drill result fits his thesis. He has a track record of follow-up coverage."
+                                </p>
+                            </div>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="grid place-items-center h-6 w-6 rounded-md bg-violet-100 text-violet-700 shrink-0 mt-0.5">
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            </span>
+                            <div>
+                                <div class="text-sm font-semibold text-slate-900">A suggested angle, ready to send</div>
+                                <p class="text-sm text-slate-600 leading-relaxed mt-0.5">
+                                    A concrete pitch hook — counter-story, podcast slot, follow-up — so your team isn't starting from scratch.
+                                </p>
+                            </div>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="grid place-items-center h-6 w-6 rounded-md bg-fuchsia-100 text-fuchsia-700 shrink-0 mt-0.5">
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            </span>
+                            <div>
+                                <div class="text-sm font-semibold text-slate-900">Citations on every claim</div>
+                                <p class="text-sm text-slate-600 leading-relaxed mt-0.5">
+                                    Every assertion links back to the article, episode, or post it came from. Nothing hallucinated.
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                {{-- Larger brief mockup --}}
+                <div class="order-1 lg:order-2 space-y-3">
+                    <div class="flex items-center gap-2 text-xs text-slate-500 px-2">
+                        <svg class="h-3.5 w-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7-7-7M12 21V3" /></svg>
+                        Surfaced by your release: <span class="font-medium text-slate-700 truncate">12.4 g/t Au over 28m at Big Sky</span>
+                    </div>
+
+                    <div class="rounded-2xl border border-slate-200 bg-white shadow-xl overflow-hidden">
+                        <div class="p-6 lg:p-7 space-y-6">
+                            <div>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <svg class="h-3.5 w-3.5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg>
+                                    <span class="text-xs font-semibold text-slate-900 uppercase tracking-wide">Why they're a fit</span>
+                                </div>
+                                <p class="text-sm text-slate-700 leading-relaxed">
+                                    Sinclair published "Nevada drill season heats up: five names to watch" four days ago, calling out Walker Lane high-grade plays as the most interesting setups of the quarter. Your fresh 12.4 g/t intercept at Big Sky lands squarely in that frame.
+                                </p>
+                            </div>
+
+                            <div class="rounded-xl bg-gradient-to-br from-indigo-50 via-violet-50 to-fuchsia-50 border border-indigo-100 p-4">
+                                <div class="flex items-center gap-2 mb-1.5">
+                                    <svg class="h-3.5 w-3.5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
+                                    <span class="text-xs font-semibold text-indigo-900 uppercase tracking-wide">Suggested angle</span>
+                                </div>
+                                <p class="text-sm text-slate-800 leading-relaxed">
+                                    Email Sinclair with the intercept summary. Offer Sarah for a 15-min call. Keep it factual — he dislikes promotional framing.
+                                </p>
+                            </div>
+
+                            <div>
+                                <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Citations</div>
+                                <div class="pl-3 border-l-2 border-indigo-300">
+                                    <p class="text-xs text-slate-700 italic leading-relaxed">"Walker Lane high-grade plays are the most interesting setups of the quarter…"</p>
+                                    <div class="text-[10px] text-indigo-700 mt-1 font-medium">
+                                        Nevada drill season heats up · Mining.com ↗
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {{-- ─────────────────────────────────────────────────────────────
+              WHY US
+          ───────────────────────────────────────────────────────────── --}}
+        <section class="bg-slate-900 text-white py-20 lg:py-28 relative overflow-hidden">
+            <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
+                <div class="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-indigo-500/20 blur-3xl"></div>
+                <div class="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-fuchsia-500/20 blur-3xl"></div>
+            </div>
+
+            <div class="relative max-w-7xl mx-auto px-6 lg:px-8">
+                <div class="max-w-2xl">
+                    <p class="text-xs font-semibold text-indigo-300 uppercase tracking-wider mb-3">Different by design</p>
+                    <h2 class="text-3xl lg:text-4xl font-semibold tracking-tight">
+                        We surface. <span class="text-indigo-300">You write.</span>
+                    </h2>
+                    <p class="text-lg text-slate-300 mt-4 leading-relaxed">
+                        PrComet is a discovery tool, not an outreach machine. Friction stays where it should — at the human. That's the whole point.
+                    </p>
+                </div>
+
+                <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+                    @foreach ([
+                        ['title' => 'Reasoning, not lists', 'body' => 'Databases sell you names. We tell you why each name is the right one for this story, this week.', 'icon' => 'M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z'],
+                        ['title' => 'Track records, not opinion', 'body' => "When a writer has made a public prediction, we tell you whether they were right. Reach out from a position of evidence.", 'icon' => 'M3 17l6-6 4 4 8-8M14 7h7v7'],
+                        ['title' => 'Citations on everything', 'body' => 'Every line in a brief links to the actual article, episode, or post it came from. Nothing hallucinated. Nothing implied.', 'icon' => 'M10 14a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 10a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71'],
+                    ] as $card)
+                        <div class="rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 p-6">
+                            <div class="grid place-items-center h-10 w-10 rounded-lg bg-gradient-to-br from-indigo-500 to-fuchsia-500 mb-4">
+                                <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="{{ $card['icon'] }}" /></svg>
+                            </div>
+                            <h3 class="text-lg font-semibold mb-2">{{ $card['title'] }}</h3>
+                            <p class="text-sm text-slate-300 leading-relaxed">{{ $card['body'] }}</p>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+
+        {{-- ─────────────────────────────────────────────────────────────
+              FOR WHOM
+          ───────────────────────────────────────────────────────────── --}}
+        <section id="for-whom" class="py-20 lg:py-28">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <div class="max-w-2xl">
+                    <p class="text-xs font-semibold text-indigo-600 uppercase tracking-wider mb-3">Who it's for</p>
+                    <h2 class="text-3xl lg:text-4xl font-semibold text-slate-900 tracking-tight">
+                        Made for teams that need attention to grow.
+                    </h2>
+                </div>
+
+                <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    @foreach ([
+                        ['title' => 'Growth-stage companies', 'body' => "You've hit your stride. Now you need analyst attention, podcast slots, and coverage in the publications your customers read."],
+                        ['title' => 'PR & comms agencies', 'body' => "Manage outreach across multiple clients in one workspace. Stop pitching journalists who said no last quarter; lead with the ones who actually want the story."],
+                        ['title' => 'IR teams at public companies', 'body' => 'Every press release is a chance to move the narrative — but only if the right voices pick it up. We surface them. You handle the relationship.'],
+                    ] as $aud)
+                        <div class="group rounded-2xl border border-slate-200 bg-white p-6 hover:border-indigo-300 hover:shadow-lg transition-all">
+                            <h3 class="text-base font-semibold text-slate-900 mb-3">{{ $aud['title'] }}</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">{{ $aud['body'] }}</p>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+
+        {{-- ─────────────────────────────────────────────────────────────
+              DEMO REQUEST
+          ───────────────────────────────────────────────────────────── --}}
+        <section id="request-demo" class="py-20 lg:py-28 bg-slate-50 border-t border-slate-200/70 relative overflow-hidden">
+            <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
+                <div class="absolute top-0 right-0 h-96 w-96 rounded-full bg-gradient-to-br from-indigo-200/40 to-fuchsia-200/40 blur-3xl translate-x-1/3 -translate-y-1/3"></div>
+            </div>
+
+            <div class="relative max-w-3xl mx-auto px-6 lg:px-8">
+                <div class="text-center mb-10">
+                    <p class="text-xs font-semibold text-indigo-600 uppercase tracking-wider mb-3">Request a demo</p>
+                    <h2 class="text-3xl lg:text-4xl font-semibold text-slate-900 tracking-tight">
+                        See PrComet against your content.
+                    </h2>
+                    <p class="text-lg text-slate-600 mt-4 leading-relaxed max-w-xl mx-auto">
+                        We'll ingest your last few press releases, run them through the engine, and show you the briefs we'd surface for your team. Takes about 15 minutes.
+                    </p>
+                </div>
+
+                <div class="rounded-2xl bg-white border border-slate-200 shadow-xl p-6 lg:p-8">
+                    @livewire('landing.demo-request-form')
+                </div>
+            </div>
+        </section>
+
+        {{-- ─────────────────────────────────────────────────────────────
+              FOOTER
+          ───────────────────────────────────────────────────────────── --}}
+        <footer class="border-t border-slate-200/70 py-8 bg-white">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="grid place-items-center h-6 w-6 rounded-md bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600">
+                        <svg viewBox="0 0 24 24" class="h-3 w-3 text-white" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l9-18 9 18" /><path d="M7 13h10" /></svg>
+                    </span>
+                    <span class="text-sm font-medium text-slate-700">PrComet</span>
+                </div>
+                <div class="text-xs text-slate-500">
+                    © {{ date('Y') }} PrComet. Discovery, not automation.
+                </div>
+            </div>
+        </footer>
+
+        @livewireScripts
+    </body>
+</html>
