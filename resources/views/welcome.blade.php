@@ -5,8 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>PrComet — Find the journalists who'll publish your story</title>
-        <meta name="description" content="PrComet continuously analyzes thousands of publications, podcasts, and newsletters to surface the writers most likely to engage with your story — and tells you exactly why they're a fit.">
+        <title>PrComet: Find the journalists who'll publish your story</title>
+        <meta name="description" content="PrComet continuously analyzes thousands of publications, podcasts, and newsletters to surface the writers most likely to engage with your story, and tells you exactly why they're a fit.">
 
         <link rel="icon" type="image/svg+xml" href="/favicon.svg">
         <link rel="alternate icon" href="/favicon.ico">
@@ -25,11 +25,7 @@
         <header class="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-slate-200/60">
             <div class="max-w-7xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
                 <a href="/" class="flex items-center gap-2.5">
-                    <span class="grid place-items-center h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 shadow-sm">
-                        <svg viewBox="0 0 24 24" class="h-4 w-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M5 18 L 19 6" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-dasharray="2 3" opacity="0.45" /><circle cx="5" cy="18" r="1.7" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none" /><circle cx="19" cy="6" r="2.4" fill="currentColor" stroke="none" />
-                        </svg>
-                    </span>
+                    <span class="h-7 w-7 rounded-full bg-slate-900"></span>
                     <span class="font-semibold text-slate-900 tracking-tight">PrComet</span>
                 </a>
 
@@ -80,7 +76,7 @@
                     </h1>
 
                     <p class="text-lg text-slate-600 leading-relaxed max-w-xl">
-                        PrComet reads thousands of articles, podcasts, and newsletters every week so you don't have to. We surface the journalists, hosts, and analysts most likely to engage with your story — and we tell you exactly why each one is a fit.
+                        PrComet reads thousands of articles, podcasts, and newsletters every week so you don't have to. We surface the journalists, hosts, and analysts most likely to engage with your story, and we tell you exactly why each one is a fit.
                     </p>
 
                     <div class="flex flex-col sm:flex-row gap-3">
@@ -166,7 +162,7 @@
                                     </div>
                                 </div>
 
-                                {{-- The "why" — short and punchy --}}
+                                {{-- The "why": short and punchy --}}
                                 <div class="space-y-3">
                                     <div>
                                         <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Why he's a fit</div>
@@ -195,17 +191,17 @@
         </section>
 
         {{-- ─────────────────────────────────────────────────────────────
-              HOW IT WORKS — 3 steps with mini mockups
+              HOW IT WORKS · 3 steps with mini mockups
           ───────────────────────────────────────────────────────────── --}}
         <section id="how" class="bg-slate-50 border-y border-slate-200/70 py-20 lg:py-28">
             <div class="max-w-7xl mx-auto px-6 lg:px-8">
                 <div class="max-w-2xl">
                     <p class="text-xs font-semibold text-indigo-600 uppercase tracking-wider mb-3">How it works</p>
-                    <h2 class="text-3xl lg:text-4xl font-semibold text-slate-900 tracking-tight">
-                        Three things happen. None of them are pitching at scale.
+                    <h2 class="text-3xl lg:text-4xl font-semibold text-slate-900 tracking-tight [text-wrap:balance]">
+                        You hit publish. The universe shrugs.
                     </h2>
                     <p class="text-lg text-slate-600 mt-4 leading-relaxed">
-                        PrComet sits between your content and the universe of publications. It reads on your behalf, finds the fits, and hands them to you with the reasoning intact.
+                        Somewhere in the thousands of articles, podcasts, and newsletters going out this week, there are three or four writers who'd be excited about your story. They're buried under everything else. PrComet reads on your behalf, finds them, and shows you exactly why each one is a fit.
                     </p>
                 </div>
 
@@ -218,7 +214,7 @@
                             <h3 class="text-lg font-semibold text-slate-900">Connect your content</h3>
                         </div>
                         <p class="text-sm text-slate-600 leading-relaxed">
-                            Point us at your RSS feed — press releases, blog posts, product updates. We watch it for new publications and use them as the trigger for discovery.
+                            Point us at your RSS feed: press releases, blog posts, product updates. We watch it for new publications and use them as the trigger for discovery.
                         </p>
 
                         <div class="rounded-xl bg-white border border-slate-200 shadow-sm p-4 space-y-3">
@@ -291,7 +287,7 @@
                             <h3 class="text-lg font-semibold text-slate-900">You see the matches</h3>
                         </div>
                         <p class="text-sm text-slate-600 leading-relaxed">
-                            For each new piece of your content, we surface the writers most likely to engage — ranked by fit, with the rationale, citations, and a suggested angle.
+                            For each new piece of your content, we surface the writers most likely to engage, ranked by fit, with the rationale, citations, and a suggested angle.
                         </p>
 
                         <div class="rounded-xl bg-white border border-slate-200 shadow-sm p-4">
@@ -319,7 +315,7 @@
         </section>
 
         {{-- ─────────────────────────────────────────────────────────────
-              THE BRIEF — main feature showcase
+              THE BRIEF · main feature showcase
           ───────────────────────────────────────────────────────────── --}}
         <section id="brief" class="py-20 lg:py-28">
             <div class="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -329,7 +325,7 @@
                         Every match comes with reasoning.
                     </h2>
                     <p class="text-lg text-slate-600 leading-relaxed">
-                        Lists of journalists aren't useful — anyone can sell you a database. PrComet shows you <em class="font-medium text-slate-900">why</em> a specific writer is the right person for a specific story, with citations linking back to their actual work.
+                        Lists of journalists aren't useful. Anyone can sell you a database. PrComet shows you <em class="font-medium text-slate-900">why</em> a specific writer is the right person for a specific story, with citations linking back to their actual work.
                     </p>
 
                     <ul class="space-y-4 pt-2">
@@ -351,7 +347,7 @@
                             <div>
                                 <div class="text-sm font-semibold text-slate-900">A suggested angle, ready to send</div>
                                 <p class="text-sm text-slate-600 leading-relaxed mt-0.5">
-                                    A concrete pitch hook — counter-story, podcast slot, follow-up — so your team isn't starting from scratch.
+                                    A concrete pitch hook (counter-story, podcast slot, follow-up) so your team isn't starting from scratch.
                                 </p>
                             </div>
                         </li>
@@ -394,7 +390,7 @@
                                     <span class="text-xs font-semibold text-indigo-900 uppercase tracking-wide">Suggested angle</span>
                                 </div>
                                 <p class="text-sm text-slate-800 leading-relaxed">
-                                    Email Sinclair with the intercept summary. Offer Sarah for a 15-min call. Keep it factual — he dislikes promotional framing.
+                                    Email Sinclair with the intercept summary. Offer Sarah for a 15-min call. Keep it factual. He dislikes promotional framing.
                                 </p>
                             </div>
 
@@ -429,7 +425,7 @@
                         We surface. <span class="text-indigo-300">You write.</span>
                     </h2>
                     <p class="text-lg text-slate-300 mt-4 leading-relaxed">
-                        PrComet is a discovery tool, not an outreach machine. Friction stays where it should — at the human. That's the whole point.
+                        PrComet is a discovery tool, not an outreach machine. Friction stays where it should: at the human. That's the whole point.
                     </p>
                 </div>
 
@@ -467,7 +463,7 @@
                     @foreach ([
                         ['title' => 'Growth-stage companies', 'body' => "You've hit your stride. Now you need analyst attention, podcast slots, and coverage in the publications your customers read."],
                         ['title' => 'PR & comms agencies', 'body' => "Manage outreach across multiple clients in one workspace. Stop pitching journalists who said no last quarter; lead with the ones who actually want the story."],
-                        ['title' => 'IR teams at public companies', 'body' => 'Every press release is a chance to move the narrative — but only if the right voices pick it up. We surface them. You handle the relationship.'],
+                        ['title' => 'IR teams at public companies', 'body' => 'Every press release is a chance to move the narrative, but only if the right voices pick it up. We surface them. You handle the relationship.'],
                     ] as $aud)
                         <div class="group rounded-2xl border border-slate-200 bg-white p-6 hover:border-indigo-300 hover:shadow-lg transition-all">
                             <h3 class="text-base font-semibold text-slate-900 mb-3">{{ $aud['title'] }}</h3>
@@ -509,9 +505,7 @@
         <footer class="border-t border-slate-200/70 py-8 bg-white">
             <div class="max-w-7xl mx-auto px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
                 <div class="flex items-center gap-2">
-                    <span class="grid place-items-center h-6 w-6 rounded-md bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600">
-                        <svg viewBox="0 0 24 24" class="h-3 w-3 text-white" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 18 L 19 6" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-dasharray="2 3" opacity="0.45" /><circle cx="5" cy="18" r="1.7" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none" /><circle cx="19" cy="6" r="2.4" fill="currentColor" stroke="none" /></svg>
-                    </span>
+                    <span class="h-5 w-5 rounded-full bg-slate-900"></span>
                     <span class="text-sm font-medium text-slate-700">PrComet</span>
                 </div>
                 <div class="text-xs text-slate-500">
