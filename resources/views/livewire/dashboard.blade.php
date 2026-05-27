@@ -41,89 +41,122 @@
         @if ($hero)
             {{-- ─────────────────────────────────────────────────────────────
                   HERO OPPORTUNITY — the brief
+                  White card with a thin gradient signal stripe + accent-only
+                  colour. The dashboard is daily use, so readability wins.
               ───────────────────────────────────────────────────────────── --}}
-            <section class="relative overflow-hidden rounded-2xl shadow-xl text-white
-                            bg-gradient-to-br {{ $gradientFor((float) $hero->score) }}">
+            @php
+                $score = (float) $hero->score;
+                $heroGradient = $gradientFor($score);
+                $fitLabel = $score >= 0.80 ? 'High fit' : ($score >= 0.65 ? 'Strong fit' : 'Worth a look');
+                $fitTone  = $score >= 0.80 ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+                                            : ($score >= 0.65 ? 'text-brand-700 bg-brand-50 border-brand-200'
+                                            : 'text-slate-700 bg-slate-100 border-slate-200');
+            @endphp
 
-                {{-- Decorative glow blobs --}}
-                <div class="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
-                <div class="absolute -bottom-20 -left-20 h-72 w-72 rounded-full bg-fuchsia-400/20 blur-3xl"></div>
-                {{-- Subtle noise overlay for depth --}}
-                <div class="absolute inset-0 opacity-[0.04] mix-blend-overlay"
-                     style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%272%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23n)%27/%3E%3C/svg%3E');"></div>
+            <section class="relative overflow-hidden rounded-2xl bg-white border border-slate-200 shadow-md">
+                {{-- Thin gradient signal stripe along the top — keeps brand
+                     identity without painting the whole card. --}}
+                <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r {{ $heroGradient }}"></div>
 
-                <div class="relative p-8 lg:p-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {{-- LEFT 2/3: meta + title + reasoning --}}
-                    <div class="lg:col-span-2 space-y-6">
-                        <div class="flex items-center gap-3">
-                            <span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/15 backdrop-blur-sm text-xs font-medium uppercase tracking-wider">
+                {{-- Faint tinted glow in the top-right corner, reading as "vibrant"
+                     without bleeding into the reading area. --}}
+                <div class="absolute -top-16 -right-16 h-56 w-56 rounded-full bg-gradient-to-br {{ $heroGradient }} opacity-[0.06] blur-3xl pointer-events-none"></div>
+
+                <div class="relative p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-6 lg:gap-8 items-start">
+                    {{-- LEFT: content --}}
+                    <div class="space-y-5 min-w-0">
+                        {{-- Status + meta --}}
+                        <div class="flex items-center flex-wrap gap-x-2 gap-y-1 text-xs">
+                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-semibold uppercase tracking-wider text-[10px]">
                                 <span class="relative flex h-1.5 w-1.5">
-                                    <span class="absolute inline-flex h-full w-full rounded-full bg-white opacity-75 animate-ping"></span>
-                                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
+                                    <span class="absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-60 animate-ping"></span>
+                                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500"></span>
                                 </span>
-                                Top opportunity · {{ $hero->created_at->diffForHumans(short: true) }}
+                                Top opportunity
                             </span>
+                            <span class="text-slate-400">·</span>
+                            <span class="text-slate-500">{{ $hero->created_at->diffForHumans(short: true) }}</span>
+                            <span class="text-slate-400">·</span>
+                            <span class="text-slate-500">For <a href="{{ route('companies.show', $hero->company) }}" wire:navigate class="font-medium text-slate-700 hover:text-brand-700">{{ $hero->company->name }}</a></span>
                         </div>
 
+                        {{-- Author + title --}}
                         <div>
                             <div class="flex items-center gap-3 mb-3">
-                                <div class="grid place-items-center h-9 w-9 rounded-lg bg-white/15 backdrop-blur-sm font-semibold text-sm">
+                                <div class="grid place-items-center h-10 w-10 rounded-full bg-gradient-to-br {{ $heroGradient }} text-white font-semibold text-sm ring-2 ring-white shadow shrink-0">
                                     {{ strtoupper(substr($hero->publicationItem->source->name, 0, 2)) }}
                                 </div>
-                                <div class="text-sm">
-                                    <div class="font-medium text-white">{{ $hero->author?->name ?? $hero->publicationItem->source->name }}</div>
-                                    <div class="text-white/70 text-xs">{{ $hero->publicationItem->source->name }}{{ $hero->author ? ' · '.optional($hero->publicationItem->published_at)->diffForHumans(short: true) : '' }}</div>
+                                <div class="min-w-0">
+                                    <div class="text-sm font-semibold text-slate-900 leading-tight">
+                                        {{ $hero->author?->name ?? $hero->publicationItem->source->name }}
+                                    </div>
+                                    <div class="text-xs text-slate-500 mt-0.5">
+                                        {{ $hero->publicationItem->source->name }}{{ $hero->publicationItem->published_at ? ' · '.$hero->publicationItem->published_at->diffForHumans(short: true) : '' }}
+                                    </div>
                                 </div>
                             </div>
-                            <h2 class="text-2xl lg:text-3xl font-semibold leading-tight tracking-tight">
+                            <h2 class="text-xl lg:text-2xl font-semibold text-slate-900 leading-snug tracking-tight">
                                 {{ $hero->publicationItem->title }}
                             </h2>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-                                <div class="text-[10px] font-semibold uppercase tracking-wider text-white/60 mb-2">Why they're a fit</div>
-                                <p class="text-sm leading-relaxed text-white/95 line-clamp-5">{{ \Illuminate\Support\Str::limit(strip_tags($hero->rationale_md), 280) }}</p>
+                        {{-- Why + angle: two clean sections, divided not boxed --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-1">
+                            <div>
+                                <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Why they're a fit</div>
+                                <p class="text-sm leading-relaxed text-slate-700 line-clamp-4">{{ \Illuminate\Support\Str::limit(strip_tags($hero->rationale_md), 240) }}</p>
                             </div>
-                            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-                                <div class="text-[10px] font-semibold uppercase tracking-wider text-white/60 mb-2">Suggested angle</div>
-                                <p class="text-sm leading-relaxed text-white/95 line-clamp-5">{{ \Illuminate\Support\Str::limit(strip_tags($hero->suggested_angle_md), 220) }}</p>
+                            <div>
+                                <div class="text-[10px] font-semibold uppercase tracking-wider text-brand-700 mb-1.5">Suggested angle</div>
+                                <p class="text-sm leading-relaxed text-slate-700 line-clamp-4">{{ \Illuminate\Support\Str::limit(strip_tags($hero->suggested_angle_md), 200) }}</p>
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-3 pt-1">
+                        {{-- Action --}}
+                        <div class="pt-1">
                             <a href="{{ route('matches.show', $hero) }}" wire:navigate
-                               class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white text-slate-900 font-medium text-sm hover:bg-slate-100 transition-colors shadow-lg">
+                               class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-medium text-sm transition-colors shadow-sm">
                                 Open full brief
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6" /></svg>
                             </a>
-                            <span class="text-white/70 text-xs">
-                                For <span class="text-white font-medium">{{ $hero->company->name }}</span>
-                            </span>
                         </div>
                     </div>
 
-                    {{-- RIGHT 1/3: score gauge --}}
-                    <div class="flex lg:justify-end">
-                        <div class="relative h-44 w-44">
+                    {{-- RIGHT: compact score gauge --}}
+                    <div class="lg:w-36 flex items-start gap-4 lg:flex-col lg:items-center lg:gap-2 lg:pt-1">
+                        <div class="relative h-28 w-28 shrink-0">
                             @php
-                                $score = (float) $hero->score;
-                                $circumference = 2 * pi() * 70;
+                                $circumference = 2 * pi() * 44;
                                 $offset = $circumference * (1 - $score);
                             @endphp
-                            <svg viewBox="0 0 160 160" class="h-full w-full -rotate-90">
-                                <circle cx="80" cy="80" r="70" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="10" />
-                                <circle cx="80" cy="80" r="70" fill="none" stroke="white" stroke-width="10" stroke-linecap="round"
-                                        stroke-dasharray="{{ $circumference }}"
-                                        stroke-dashoffset="{{ $offset }}"
+                            <svg viewBox="0 0 100 100" class="h-full w-full -rotate-90">
+                                <defs>
+                                    <linearGradient id="heroGaugeFill" x1="0" y1="0" x2="1" y2="1">
+                                        <stop offset="0%" stop-color="#4339DC" />
+                                        <stop offset="50%" stop-color="#7C3AED" />
+                                        <stop offset="100%" stop-color="#C026D3" />
+                                    </linearGradient>
+                                </defs>
+                                <circle cx="50" cy="50" r="44" fill="none" stroke="#F1F5F9" stroke-width="7" />
+                                <circle cx="50" cy="50" r="44" fill="none" stroke="url(#heroGaugeFill)" stroke-width="7" stroke-linecap="round"
+                                        stroke-dasharray="{{ $circumference }}" stroke-dashoffset="{{ $offset }}"
                                         style="transition: stroke-dashoffset 800ms cubic-bezier(0.22, 1, 0.36, 1);" />
                             </svg>
-                            <div class="absolute inset-0 grid place-items-center text-center">
-                                <div>
-                                    <div class="text-5xl font-bold tabular leading-none">{{ number_format($score * 100) }}<span class="text-2xl font-medium text-white/70">%</span></div>
-                                    <div class="mt-1.5 text-[10px] uppercase tracking-wider text-white/70 font-medium">Match confidence</div>
+                            <div class="absolute inset-0 grid place-items-center">
+                                <div class="text-center">
+                                    <div class="text-3xl font-bold tabular leading-none">
+                                        <span class="bg-gradient-to-br {{ $heroGradient }} bg-clip-text text-transparent">{{ number_format($score * 100) }}</span><span class="text-base text-slate-400">%</span>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="flex flex-col gap-1.5 lg:items-center">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider border {{ $fitTone }}">
+                                <span class="h-1 w-1 rounded-full bg-current"></span>
+                                {{ $fitLabel }}
+                            </span>
+                            <span class="text-[10px] uppercase tracking-wider text-slate-400 font-medium">Match confidence</span>
                         </div>
                     </div>
                 </div>
