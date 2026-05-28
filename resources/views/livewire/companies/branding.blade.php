@@ -112,6 +112,47 @@
                 </div>
             </section>
 
+            {{-- Blanket media release: company-wide default that every library
+                 asset inherits unless the asset has its own override. --}}
+            <section class="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
+                <div>
+                    <h2 class="text-sm font-semibold text-slate-900">Blanket media release</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">The default permission grant attached to every asset in your <a href="{{ route('companies.library', $company) }}" wire:navigate class="text-brand-700 hover:underline">media library</a>. Individual assets can override.</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1.5">Release text</label>
+                    <textarea wire:model="blanketReleaseText" rows="4"
+                              class="w-full rounded-md border-slate-200 text-sm focus:border-brand-500 focus:ring-brand-500"
+                              placeholder="{{ $company->name }} grants single-use editorial reproduction of these materials, with credit, for stories about the company published within 90 days of receipt."></textarea>
+                    <p class="text-[11px] text-slate-500 mt-1">Plain text. Appears at the bottom of every one-pager that uses library assets.</p>
+                    @error('blanketReleaseText') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                @if ($company->blanket_media_release_file_path)
+                    <div class="rounded-md border border-slate-200 bg-slate-50 p-3 flex items-center justify-between gap-3 text-xs">
+                        <div class="flex items-center gap-2 text-slate-700">
+                            <svg class="h-4 w-4 text-rose-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                            <span class="font-medium">Signed release PDF attached.</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <a href="{{ $company->blanketMediaReleaseFileUrl() }}" target="_blank" rel="noopener" class="text-brand-700 hover:underline">Open ↗</a>
+                            <button type="button" wire:click="removeBlanketReleaseFile" class="text-rose-600 hover:text-rose-700">Remove</button>
+                        </div>
+                    </div>
+                @endif
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1.5">
+                        {{ $company->blanket_media_release_file_path ? 'Replace release PDF' : 'Attach release PDF' }}
+                        <span class="text-slate-400">(optional, max 5 MB)</span>
+                    </label>
+                    <input type="file" wire:model="blanketReleaseFile" accept="application/pdf"
+                           class="block w-full text-sm text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-medium file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200" />
+                    @error('blanketReleaseFile') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                </div>
+            </section>
+
             <div class="flex justify-end">
                 <button type="submit" wire:loading.attr="disabled" class="btn-primary">
                     <span wire:loading.remove>Save branding</span>

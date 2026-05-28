@@ -10,22 +10,22 @@
                 <h1 class="text-base font-semibold text-slate-900 mt-0.5">Media library</h1>
             </div>
             <div class="flex items-center gap-2">
-                <button wire:click="openEditor('image')" class="btn-secondary">
+                <a href="{{ route('companies.library.create', ['company' => $company, 'type' => 'image']) }}" wire:navigate class="btn-secondary">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                     Image
-                </button>
-                <button wire:click="openEditor('pdf')" class="btn-secondary">
+                </a>
+                <a href="{{ route('companies.library.create', ['company' => $company, 'type' => 'pdf']) }}" wire:navigate class="btn-secondary">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                     PDF
-                </button>
-                <button wire:click="openEditor('quote')" class="btn-secondary">
+                </a>
+                <a href="{{ route('companies.library.create', ['company' => $company, 'type' => 'quote']) }}" wire:navigate class="btn-secondary">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h6m-6 4h10M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                     Quote
-                </button>
-                <button wire:click="openEditor('link')" class="btn-primary">
+                </a>
+                <a href="{{ route('companies.library.create', ['company' => $company, 'type' => 'link']) }}" wire:navigate class="btn-primary">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
                     Link
-                </button>
+                </a>
             </div>
         </div>
     </x-slot>
@@ -86,8 +86,8 @@
                 @foreach ($this->assets as $asset)
                     <article wire:key="asset-{{ $asset->id }}"
                              class="group rounded-xl border border-slate-200 bg-white overflow-hidden flex flex-col hover:shadow-md transition-shadow">
-                        {{-- Preview --}}
-                        <div class="aspect-[4/3] bg-slate-100 overflow-hidden relative">
+                        {{-- Preview — whole card links into the edit page. --}}
+                        <a href="{{ route('companies.library.edit', ['company' => $company, 'asset' => $asset]) }}" wire:navigate class="aspect-[4/3] bg-slate-100 overflow-hidden relative block">
                             @if (in_array($asset->type, ['image', 'logo', 'header']) && $asset->file_path)
                                 <img src="{{ $asset->publicUrl() }}" alt="{{ $asset->name }}" class="w-full h-full object-cover" />
                             @elseif ($asset->type === 'pdf')
@@ -119,7 +119,7 @@
                                     From PR
                                 </span>
                             @endif
-                        </div>
+                        </a>
 
                         {{-- Meta --}}
                         <div class="p-3 flex-1 flex flex-col">
@@ -139,7 +139,7 @@
                             @endif
 
                             <div class="flex items-center gap-1 mt-3 pt-3 border-t border-slate-100">
-                                <button wire:click="openEditor('image', {{ $asset->id }})" type="button" class="flex-1 text-[11px] text-slate-600 hover:text-brand-700 py-1 transition-colors">Edit</button>
+                                <a href="{{ route('companies.library.edit', ['company' => $company, 'asset' => $asset]) }}" wire:navigate class="flex-1 text-[11px] text-slate-600 hover:text-brand-700 py-1 transition-colors text-center">Edit</a>
                                 <button wire:click="toggleActive({{ $asset->id }})" type="button" class="flex-1 text-[11px] text-slate-600 hover:text-brand-700 py-1 transition-colors border-l border-slate-100">{{ $asset->is_active ? 'Hide' : 'Show' }}</button>
                                 <button wire:click="delete({{ $asset->id }})" wire:confirm="Delete this asset? It will be removed from any one-pagers using it." type="button" class="flex-1 text-[11px] text-rose-600 hover:text-rose-700 py-1 transition-colors border-l border-slate-100">Delete</button>
                             </div>
@@ -150,91 +150,5 @@
         @endif
     </div>
 
-    {{-- Editor modal --}}
-    @if ($editorOpen)
-        <div class="fixed inset-0 z-50 grid place-items-center bg-slate-900/40 backdrop-blur-sm" wire:click.self="closeEditor">
-            <div class="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
-                <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                    <h2 class="text-base font-semibold text-slate-900">
-                        {{ $editingId ? 'Edit asset' : ('Add ' . $editingMode) }}
-                    </h2>
-                    <button wire:click="closeEditor" class="text-slate-400 hover:text-slate-700">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-                    </button>
-                </div>
-
-                <form wire:submit="save" class="p-6 space-y-4">
-                    @if (in_array($editingMode, ['image', 'pdf']))
-                        <div>
-                            <label class="block text-xs font-medium text-slate-700 mb-1.5">Name <span class="text-rose-500">*</span></label>
-                            <input type="text" wire:model="name" class="w-full rounded-md border-slate-200 text-sm focus:border-brand-500 focus:ring-brand-500" />
-                            @error('name') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-medium text-slate-700 mb-1.5">Description</label>
-                            <textarea wire:model="description" rows="2" class="w-full rounded-md border-slate-200 text-sm focus:border-brand-500 focus:ring-brand-500"></textarea>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-medium text-slate-700 mb-1.5">
-                                File @if (! $editingId) <span class="text-rose-500">*</span> @endif
-                            </label>
-                            <input type="file" wire:model="file" accept="{{ $editingMode === 'pdf' ? 'application/pdf' : 'image/*' }}"
-                                   class="block w-full text-sm text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-medium file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200" />
-                            @if ($editingId)
-                                <p class="text-[11px] text-slate-500 mt-1">Leave empty to keep the existing file.</p>
-                            @endif
-                            <div wire:loading wire:target="file" class="text-xs text-slate-500 mt-1">Uploading...</div>
-                            @error('file') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
-                        </div>
-                    @endif
-
-                    @if ($editingMode === 'quote')
-                        <div>
-                            <label class="block text-xs font-medium text-slate-700 mb-1.5">Quote <span class="text-rose-500">*</span></label>
-                            <textarea wire:model="quoteText" rows="3" class="w-full rounded-md border-slate-200 text-sm focus:border-brand-500 focus:ring-brand-500" placeholder="The quote, no quotation marks needed."></textarea>
-                            @error('quoteText') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-slate-700 mb-1.5">Attribution <span class="text-rose-500">*</span></label>
-                            <input type="text" wire:model="quoteAttribution" placeholder="Sarah Chen, CEO" class="w-full rounded-md border-slate-200 text-sm focus:border-brand-500 focus:ring-brand-500" />
-                            @error('quoteAttribution') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
-                        </div>
-                    @endif
-
-                    @if ($editingMode === 'link')
-                        <div>
-                            <label class="block text-xs font-medium text-slate-700 mb-1.5">Title <span class="text-rose-500">*</span></label>
-                            <input type="text" wire:model="name" placeholder="Q3 analyst report" class="w-full rounded-md border-slate-200 text-sm focus:border-brand-500 focus:ring-brand-500" />
-                            @error('name') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-slate-700 mb-1.5">URL <span class="text-rose-500">*</span></label>
-                            <input type="url" wire:model="url" placeholder="https://..." class="w-full rounded-md border-slate-200 text-sm focus:border-brand-500 focus:ring-brand-500" />
-                            @error('url') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-slate-700 mb-1.5">Description</label>
-                            <textarea wire:model="description" rows="2" class="w-full rounded-md border-slate-200 text-sm focus:border-brand-500 focus:ring-brand-500"></textarea>
-                        </div>
-                    @endif
-
-                    <div>
-                        <label class="block text-xs font-medium text-slate-700 mb-1.5">Tags</label>
-                        <input type="text" wire:model="tagsCsv" placeholder="gold, nevada, drill-results" class="w-full rounded-md border-slate-200 text-sm focus:border-brand-500 focus:ring-brand-500" />
-                        <p class="text-[11px] text-slate-500 mt-1">Comma-separated. Used to match assets to one-pagers automatically.</p>
-                    </div>
-
-                    <div class="flex items-center justify-end gap-2 pt-2">
-                        <button type="button" wire:click="closeEditor" class="btn-secondary">Cancel</button>
-                        <button type="submit" wire:loading.attr="disabled" class="btn-primary">
-                            <span wire:loading.remove>{{ $editingId ? 'Save' : 'Add to library' }}</span>
-                            <span wire:loading>Saving...</span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    @endif
+    {{-- Editor lives on its own page now — see Companies\MediaAssetEdit. --}}
 </div>

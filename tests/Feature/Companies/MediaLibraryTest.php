@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Companies\MediaAssetEdit;
 use App\Livewire\Companies\MediaLibrary;
 use App\Models\Company;
 use App\Models\MediaAsset;
@@ -31,13 +32,14 @@ it('forbids accessing another team\'s media library', function () {
         ->assertForbidden();
 });
 
-it('adds a pull-quote asset from the editor', function () {
+it('adds a pull-quote asset from the dedicated editor page', function () {
     $user = makeUserWithTeam(['is_active' => true, 'max_companies' => 5]);
     $company = Company::factory()->create(['team_id' => $user->currentTeam->id]);
 
     Livewire::actingAs($user)
-        ->test(MediaLibrary::class, ['company' => $company])
-        ->call('openEditor', 'quote')
+        ->test(MediaAssetEdit::class, ['company' => $company])
+        ->set('type', 'quote')
+        ->set('name', 'Walker Lane quote')
         ->set('quoteText', 'Walker Lane is the most interesting setup of the quarter.')
         ->set('quoteAttribution', 'Sarah Chen, CEO')
         ->set('tagsCsv', 'Gold, Nevada')
@@ -58,8 +60,8 @@ it('uploads an image to the public disk', function () {
     $company = Company::factory()->create(['team_id' => $user->currentTeam->id]);
 
     Livewire::actingAs($user)
-        ->test(MediaLibrary::class, ['company' => $company])
-        ->call('openEditor', 'image')
+        ->test(MediaAssetEdit::class, ['company' => $company])
+        ->set('type', 'image')
         ->set('name', 'Big Sky core photo')
         ->set('file', UploadedFile::fake()->image('core.jpg', 1200, 800))
         ->call('save');
@@ -75,8 +77,8 @@ it('adds an external link asset', function () {
     $company = Company::factory()->create(['team_id' => $user->currentTeam->id]);
 
     Livewire::actingAs($user)
-        ->test(MediaLibrary::class, ['company' => $company])
-        ->call('openEditor', 'link')
+        ->test(MediaAssetEdit::class, ['company' => $company])
+        ->set('type', 'link')
         ->set('name', 'Analyst report')
         ->set('url', 'https://example.com/report.html')
         ->call('save');
@@ -91,8 +93,9 @@ it('requires the quote text and attribution', function () {
     $company = Company::factory()->create(['team_id' => $user->currentTeam->id]);
 
     Livewire::actingAs($user)
-        ->test(MediaLibrary::class, ['company' => $company])
-        ->call('openEditor', 'quote')
+        ->test(MediaAssetEdit::class, ['company' => $company])
+        ->set('type', 'quote')
+        ->set('name', 'Anything')
         ->call('save')
         ->assertHasErrors(['quoteText' => 'required', 'quoteAttribution' => 'required']);
 });

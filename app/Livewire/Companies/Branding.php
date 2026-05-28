@@ -48,6 +48,13 @@ class Branding extends Component
     #[Validate('nullable|url|max:255')]
     public string $linkedin = '';
 
+    // Blanket media release inherited by library assets.
+    #[Validate('nullable|string|max:5000')]
+    public string $blanketReleaseText = '';
+
+    #[Validate('nullable|file|mimes:pdf|max:5120')]
+    public $blanketReleaseFile;
+
     public function mount(Company $company): void
     {
         abort_unless($company->team_id === auth()->user()->currentTeam?->id, 403);
@@ -64,6 +71,7 @@ class Branding extends Component
         $this->pressContactEmail = $company->press_contact_email ?? '';
         $this->twitter = $company->social_links['twitter'] ?? '';
         $this->linkedin = $company->social_links['linkedin'] ?? '';
+        $this->blanketReleaseText = $company->blanket_media_release_text ?? '';
     }
 
     public function save(): void
@@ -79,6 +87,7 @@ class Branding extends Component
                 'twitter' => $this->twitter ?: null,
                 'linkedin' => $this->linkedin ?: null,
             ]),
+            'blanket_media_release_text' => $this->blanketReleaseText ?: null,
         ];
 
         if ($this->logo instanceof TemporaryUploadedFile) {
@@ -91,11 +100,24 @@ class Branding extends Component
             $payload['header_image_path'] = $this->headerImage->store('branding/'.$this->company->id, config('filesystems.default'));
         }
 
+        if ($this->blanketReleaseFile instanceof TemporaryUploadedFile) {
+            $this->deletePrevious($this->company->blanket_media_release_file_path);
+            $payload['blanket_media_release_file_path'] = $this->blanketReleaseFile->store('media-releases/'.$this->company->id, config('filesystems.default'));
+        }
+
         $this->company->update($payload);
         $this->logo = null;
         $this->headerImage = null;
+        $this->blanketReleaseFile = null;
 
         session()->flash('status', 'Branding updated.');
+    }
+
+    public function removeBlanketReleaseFile(): void
+    {
+        $this->deletePrevious($this->company->blanket_media_release_file_path);
+        $this->company->update(['blanket_media_release_file_path' => null]);
+        session()->flash('status', 'Release file removed.');
     }
 
     public function removeLogo(): void

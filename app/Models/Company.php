@@ -47,6 +47,9 @@ class Company extends Model
         'description_md',
         'press_contact_email',
         'social_links',
+        // Blanket media release inherited by library assets
+        'blanket_media_release_text',
+        'blanket_media_release_file_path',
     ];
 
     protected function casts(): array
@@ -91,6 +94,13 @@ class Company extends Model
     {
         return $this->header_image_path
             ? Storage::disk(config('filesystems.default'))->url($this->header_image_path)
+            : null;
+    }
+
+    public function blanketMediaReleaseFileUrl(): ?string
+    {
+        return $this->blanket_media_release_file_path
+            ? Storage::disk(config('filesystems.default'))->url($this->blanket_media_release_file_path)
             : null;
     }
 }

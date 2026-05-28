@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -38,6 +39,11 @@ class MediaAsset extends Model
         'type',
         'name',
         'description',
+        'credit',
+        'credit_url',
+        'uses_blanket_release',
+        'media_release_text',
+        'media_release_file_path',
         'file_path',
         'mime_type',
         'size_bytes',
@@ -58,6 +64,7 @@ class MediaAsset extends Model
         return [
             'tags' => 'array',
             'is_active' => 'boolean',
+            'uses_blanket_release' => 'boolean',
             'size_bytes' => 'integer',
             'width_px' => 'integer',
             'height_px' => 'integer',
@@ -80,6 +87,72 @@ class MediaAsset extends Model
         return $this->belongsToMany(OnePager::class, 'one_pager_assets')
             ->withPivot('sort_order')
             ->withTimestamps();
+    }
+
+    public function revisions(): HasMany
+    {
+        return $this->hasMany(MediaAssetRevision::class)->orderByDesc('created_at');
+    }
+
+    /**
+     * URL for the per-asset media-release PDF (if any). Same disk routing
+     * as the asset itself.
+     */
+    public function mediaReleaseFileUrl(): ?string
+    {
+        if (! $this->media_release_file_path) {
+            return null;
+        }
+
+        return Storage::disk(config('filesystems.default'))->url($this->media_release_file_path);
+    }
+
+    /**
+     * Resolve the release text that applies to this asset — either its own
+     * override or the company's blanket text. Returns null if neither is set.
+     */
+    public function effectiveReleaseText(): ?string
+    {
+        if (! $this->uses_blanket_release && filled($this->media_release_text)) {
+            return $this->media_release_text;
+        }
+
+        return $this->company?->blanket_media_release_text;
+    }
+
+    /**
+     * Resolve the release PDF that applies — per-asset override wins, then
+     * falls back to the company's blanket PDF.
+     */
+    public function effectiveReleaseFileUrl(): ?string
+    {
+        if (! $this->uses_blanket_release && $this->media_release_file_path) {
+            return $this->mediaReleaseFileUrl();
+        }
+
+        return $this->company?->blanketMediaReleaseFileUrl();
+    }
+
+    /**
+     * Snapshot the current file metadata into a revision row before the
+     * caller overwrites file_path with a new upload. Returns the revision
+     * (or null if the asset doesn't currently have a file).
+     */
+    public function snapshotCurrentAsRevision(?int $userId = null, ?string $notes = null): ?MediaAssetRevision
+    {
+        if (! $this->file_path) {
+            return null;
+        }
+
+        return $this->revisions()->create([
+            'uploaded_by_user_id' => $userId,
+            'file_path' => $this->file_path,
+            'mime_type' => $this->mime_type,
+            'size_bytes' => $this->size_bytes,
+            'width_px' => $this->width_px,
+            'height_px' => $this->height_px,
+            'notes' => $notes,
+        ]);
     }
 
     /**
