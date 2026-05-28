@@ -103,8 +103,24 @@ it('forbids switching to a company in another team via the controller', function
 
     actingAs($user);
 
+    // Scoped query → 404 rather than 403; the response shouldn't differ
+    // from a request for a truly nonexistent id, to avoid leaking which
+    // company ids belong to other teams via timing/status.
     put(route('current-company.update'), ['company_id' => $otherCompany->id])
-        ->assertForbidden();
+        ->assertNotFound();
+
+    // And focus didn't move.
+    expect($user->fresh()->current_company_id)->toBeNull();
+});
+
+it('returns the same 404 for a non-existent company id', function () {
+    $user = makeUserWithTeam(['is_active' => true]);
+    Company::factory()->create(['team_id' => $user->currentTeam->id]);
+
+    actingAs($user);
+
+    put(route('current-company.update'), ['company_id' => 999_999])
+        ->assertNotFound();
 });
 
 /**

@@ -13,15 +13,35 @@ use Livewire\Component;
 #[Title('Wins')]
 class Index extends Component
 {
+    /**
+     * Wins reflect the currently-focused company so you don't see another
+     * company's placements when you're heads-down on this one. With no
+     * company in focus (rare: empty team), falls back to team-wide.
+     */
+    #[Computed]
+    public function currentCompany(): ?Company
+    {
+        return auth()->user()->resolveCurrentCompany();
+    }
+
+    protected function baseQuery()
+    {
+        $team = auth()->user()->currentTeam;
+        $current = $this->currentCompany;
+
+        return MatchRecord::query()
+            ->when($current,
+                fn ($q) => $q->where('company_id', $current->id),
+                fn ($q) => $q->whereIn('company_id',
+                    Company::where('team_id', $team->id)->pluck('id'))
+            );
+    }
+
     #[Computed]
     public function placedMatches()
     {
-        $team = auth()->user()->currentTeam;
-        $teamCompanyIds = Company::where('team_id', $team->id)->pluck('id');
-
-        return MatchRecord::query()
+        return $this->baseQuery()
             ->with(['company', 'publicationItem.source', 'author'])
-            ->whereIn('company_id', $teamCompanyIds)
             ->where('status', MatchRecord::STATUS_PLACED)
             ->orderByDesc('placement_published_at')
             ->orderByDesc('updated_at')
@@ -31,9 +51,7 @@ class Index extends Component
     #[Computed]
     public function stats(): array
     {
-        $team = auth()->user()->currentTeam;
-        $teamCompanyIds = Company::where('team_id', $team->id)->pluck('id');
-        $query = MatchRecord::whereIn('company_id', $teamCompanyIds);
+        $query = $this->baseQuery();
 
         return [
             'total' => (clone $query)->count(),

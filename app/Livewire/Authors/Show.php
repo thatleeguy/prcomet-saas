@@ -80,18 +80,35 @@ class Show extends Component
             ->get();
     }
 
-    /** Matches this team has on this author. */
+    /**
+     * Matches the user has on this author. Scopes to the focused company
+     * when set so users on Company A don't accidentally see Company B's
+     * private match history with this author. Falls back to team-wide
+     * only when the team has no focused company (rare).
+     */
     #[Computed]
     public function teamMatches()
     {
-        $team = auth()->user()->currentTeam;
-        return MatchRecord::query()
+        return $this->matchesScopedQuery()
             ->with(['company', 'publicationItem'])
             ->where('author_id', $this->author->id)
-            ->whereHas('company', fn ($q) => $q->where('team_id', $team->id))
             ->orderByDesc('created_at')
             ->limit(8)
             ->get();
+    }
+
+    /**
+     * Shared scope helper for the match-related panels.
+     */
+    protected function matchesScopedQuery()
+    {
+        $user = auth()->user();
+        $current = $user->resolveCurrentCompany();
+
+        return MatchRecord::query()->when($current,
+            fn ($q) => $q->where('company_id', $current->id),
+            fn ($q) => $q->whereHas('company', fn ($c) => $c->where('team_id', $user->currentTeam->id))
+        );
     }
 
     #[Computed]
@@ -102,9 +119,8 @@ class Show extends Component
             'total_items' => (clone $items)->count(),
             'last_30_days' => (clone $items)->where('published_at', '>=', now()->subDays(30))->count(),
             'topics' => count($this->topicCounts),
-            'matches' => MatchRecord::query()
+            'matches' => $this->matchesScopedQuery()
                 ->where('author_id', $this->author->id)
-                ->whereHas('company', fn ($q) => $q->where('team_id', auth()->user()->currentTeam->id))
                 ->count(),
         ];
     }

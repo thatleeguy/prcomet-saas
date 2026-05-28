@@ -69,6 +69,14 @@ class Edit extends Component
 
     public function toggleAsset(int $assetId): void
     {
+        // selectedAssetIds is wire:click-controllable — reject any id that
+        // doesn't belong to this match's company before it lands in state.
+        // (save() also re-filters, but rejecting here keeps the UI honest:
+        //  a tampered id never appears as "selected".)
+        if (! $this->ownsAsset($assetId)) {
+            return;
+        }
+
         if (in_array($assetId, $this->selectedAssetIds, true)) {
             $this->selectedAssetIds = array_values(array_diff($this->selectedAssetIds, [$assetId]));
         } else {
@@ -82,13 +90,37 @@ class Edit extends Component
 
         $this->onePager->update(['note_md' => $this->note ?: null]);
 
+        // Defence-in-depth filter: even if selectedAssetIds was poisoned via
+        // a crafted Livewire payload, only assets owned by this company
+        // make it into the sync set.
+        $allowedIds = MediaAsset::query()
+            ->where('company_id', $this->match->company_id)
+            ->whereIn('id', $this->selectedAssetIds)
+            ->pluck('id')
+            ->all();
+
+        // Preserve the user's chosen ordering, dropping anything filtered out.
         $sync = [];
-        foreach ($this->selectedAssetIds as $i => $id) {
-            $sync[$id] = ['sort_order' => $i];
+        $order = 0;
+        foreach ($this->selectedAssetIds as $id) {
+            if (in_array($id, $allowedIds, true)) {
+                $sync[$id] = ['sort_order' => $order++];
+            }
         }
         $this->onePager->assets()->sync($sync);
 
+        // Reflect the filtered set back onto state in case anything was dropped.
+        $this->selectedAssetIds = array_keys($sync);
+
         session()->flash('status', 'One-pager saved.');
+    }
+
+    /** Cheap ownership check used by toggleAsset. */
+    private function ownsAsset(int $assetId): bool
+    {
+        return MediaAsset::where('company_id', $this->match->company_id)
+            ->whereKey($assetId)
+            ->exists();
     }
 
     public function publish(): void
