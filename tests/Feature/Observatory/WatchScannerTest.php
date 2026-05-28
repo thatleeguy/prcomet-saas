@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Company;
-use App\Models\PressRelease;
 use App\Models\PublicationItem;
 use App\Models\Source;
 use App\Models\Watch;
@@ -83,8 +82,8 @@ it('is idempotent — re-scanning the same corpus does not duplicate hits', func
     expect(WatchHit::count())->toBe(1);
 });
 
-it('also scans press releases for companies in the team', function () {
-    PressRelease::factory()->create([
+it('does not scan press releases — scope is publication items only', function () {
+    \App\Models\PressRelease::factory()->create([
         'company_id' => $this->company->id,
         'title' => 'Partnership announcement',
         'body_text' => 'Working with Newmont on a JV.',
@@ -98,10 +97,11 @@ it('also scans press releases for companies in the team', function () {
         'mode' => Watch::MODE_LITERAL,
     ]);
 
-    expect(app(WatchScanner::class)->scan($watch))->toBe(1);
-
-    $hit = WatchHit::firstWhere('watch_id', $watch->id);
-    expect($hit->content_type)->toBe(WatchHit::TYPE_PRESS_RELEASE);
+    // Even though "Newmont" appears in the team's own press release,
+    // Observatory intentionally ignores it — the signal of interest
+    // is "outside world saying X", not the company's own announcements.
+    expect(app(WatchScanner::class)->scan($watch))->toBe(0);
+    expect(WatchHit::count())->toBe(0);
 });
 
 it('does not scan content for other teams', function () {

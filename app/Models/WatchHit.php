@@ -9,19 +9,19 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 /**
  * A single occurrence of a watch term inside one piece of content.
  *
- * Polymorphic so the same row layout serves PublicationItems and
- * PressReleases. The (watch_id, content_type, content_id) tuple is
- * unique — the scanner uses upsert semantics so re-running it over the
- * same corpus doesn't multiply rows.
+ * v0 only records hits against PublicationItems (the journalist
+ * corpus). The polymorphic shape — content_type + content_id — is
+ * kept so other content types can be added later without a migration.
+ * The (watch_id, content_type, content_id) tuple is unique — the
+ * scanner uses upsert semantics so re-running it over the same corpus
+ * doesn't multiply rows.
  */
 class WatchHit extends Model
 {
     public const TYPE_PUBLICATION_ITEM = 'publication_item';
-    public const TYPE_PRESS_RELEASE = 'press_release';
 
     public const MAP = [
         self::TYPE_PUBLICATION_ITEM => PublicationItem::class,
-        self::TYPE_PRESS_RELEASE => PressRelease::class,
     ];
 
     protected $fillable = [
@@ -71,9 +71,6 @@ class WatchHit extends Model
         if ($row instanceof PublicationItem) {
             return $row->url;
         }
-        if ($row instanceof PressRelease) {
-            return $row->url;
-        }
 
         return null;
     }
@@ -92,7 +89,6 @@ class WatchHit extends Model
     {
         return match ($this->content_type) {
             self::TYPE_PUBLICATION_ITEM => 'Publication item',
-            self::TYPE_PRESS_RELEASE => 'Press release',
             default => $this->content_type,
         };
     }

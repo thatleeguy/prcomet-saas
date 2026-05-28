@@ -16,9 +16,8 @@ use Livewire\WithPagination;
 /**
  * Watch detail page — the hits feed for a single watch.
  *
- * Three filters:
+ * Two filters:
  *  - status: all (default) | confirmed | rejected | pending — LLM verdict
- *  - source: all | publication_item | press_release
  *  - search: substring match on the snippet
  *
  * The "Scan now" button re-runs WatchScanner synchronously against the
@@ -38,15 +37,11 @@ class Show extends Component
     #[Url(as: 'status', except: 'all')]
     public string $statusFilter = 'all'; // all|confirmed|rejected|pending
 
-    #[Url(as: 'source', except: 'all')]
-    public string $sourceFilter = 'all';
-
     #[Url(as: 'q')]
     public string $search = '';
 
     public function updatingSearch(): void { $this->resetPage(); }
     public function updatingStatusFilter(): void { $this->resetPage(); }
-    public function updatingSourceFilter(): void { $this->resetPage(); }
 
     public function mount(Company $company, Watch $watch): void
     {
@@ -64,12 +59,6 @@ class Show extends Component
     public function setStatus(string $status): void
     {
         $this->statusFilter = $status;
-        $this->resetPage();
-    }
-
-    public function setSource(string $source): void
-    {
-        $this->sourceFilter = $source;
         $this->resetPage();
     }
 
@@ -104,8 +93,6 @@ class Show extends Component
             'confirmed' => (clone $base)->where('confirmed_by_llm', true)->count(),
             'rejected' => (clone $base)->where('confirmed_by_llm', false)->count(),
             'pending' => (clone $base)->whereNull('confirmed_by_llm')->count(),
-            'publication_item' => (clone $base)->where('content_type', WatchHit::TYPE_PUBLICATION_ITEM)->count(),
-            'press_release' => (clone $base)->where('content_type', WatchHit::TYPE_PRESS_RELEASE)->count(),
         ];
     }
 
@@ -116,7 +103,6 @@ class Show extends Component
             ->when($this->statusFilter === 'confirmed', fn ($q) => $q->where('confirmed_by_llm', true))
             ->when($this->statusFilter === 'rejected', fn ($q) => $q->where('confirmed_by_llm', false))
             ->when($this->statusFilter === 'pending', fn ($q) => $q->whereNull('confirmed_by_llm'))
-            ->when($this->sourceFilter !== 'all', fn ($q) => $q->where('content_type', $this->sourceFilter))
             ->when($this->search !== '', function ($q) {
                 $term = "%{$this->search}%";
                 $q->where('context_snippet', 'like', $term);

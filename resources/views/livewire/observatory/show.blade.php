@@ -29,11 +29,6 @@
                 'rejected' => ['label' => 'Rejected', 'count' => $counts['rejected']],
             ]
             : ['all' => ['label' => 'All', 'count' => $counts['total']]];
-        $sources = [
-            'all' => ['label' => 'Both', 'count' => $counts['total']],
-            'publication_item' => ['label' => 'Articles', 'count' => $counts['publication_item']],
-            'press_release' => ['label' => 'Press releases', 'count' => $counts['press_release']],
-        ];
     @endphp
 
     <div class="space-y-6 animate-fade-in">
@@ -66,10 +61,10 @@
                     @endforeach
                 </div>
             </div>
-            <div class="grid grid-cols-3 gap-6 shrink-0">
+            <div class="grid {{ $this->llmEnabled ? 'grid-cols-3' : 'grid-cols-1' }} gap-6 shrink-0">
                 <div>
                     <div class="text-2xl font-semibold tabular text-slate-900">{{ $counts['total'] }}</div>
-                    <div class="text-[10px] text-slate-500 uppercase tracking-wider">Hits</div>
+                    <div class="text-[10px] text-slate-500 uppercase tracking-wider">{{ \Illuminate\Support\Str::plural('hit', $counts['total']) }}</div>
                 </div>
                 @if ($this->llmEnabled)
                     <div>
@@ -79,15 +74,6 @@
                     <div>
                         <div class="text-2xl font-semibold tabular text-slate-400">{{ $counts['pending'] }}</div>
                         <div class="text-[10px] text-slate-500 uppercase tracking-wider">Pending</div>
-                    </div>
-                @else
-                    <div>
-                        <div class="text-2xl font-semibold tabular text-slate-900">{{ $counts['publication_item'] }}</div>
-                        <div class="text-[10px] text-slate-500 uppercase tracking-wider">Articles</div>
-                    </div>
-                    <div>
-                        <div class="text-2xl font-semibold tabular text-slate-900">{{ $counts['press_release'] }}</div>
-                        <div class="text-[10px] text-slate-500 uppercase tracking-wider">PRs</div>
                     </div>
                 @endif
             </div>
@@ -105,16 +91,6 @@
                     </button>
                 @endforeach
             </div>
-            <div class="flex items-center gap-1 p-1 bg-white rounded-lg border border-slate-200">
-                @foreach ($sources as $key => $f)
-                    <button wire:click="setSource('{{ $key }}')"
-                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors
-                                   {{ $sourceFilter === $key ? 'bg-brand-50 text-brand-700' : 'text-slate-600 hover:bg-slate-50' }}">
-                        {{ $f['label'] }}
-                        <span class="text-[10px] tabular {{ $sourceFilter === $key ? 'text-brand-500' : 'text-slate-400' }}">{{ $f['count'] }}</span>
-                    </button>
-                @endforeach
-            </div>
             <div class="relative flex-1 md:max-w-md md:ml-auto">
                 <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 19a8 8 0 100-16 8 8 0 000 16zM21 21l-4.35-4.35" /></svg>
                 <input type="search" wire:model.live.debounce.300ms="search" placeholder="Search snippets…"
@@ -126,7 +102,7 @@
         @if ($hits->isEmpty())
             <section class="rounded-2xl border-2 border-dashed border-slate-200 bg-white p-12 text-center">
                 <div class="text-base font-semibold text-slate-900">
-                    @if ($search !== '' || $statusFilter !== 'all' || $sourceFilter !== 'all')
+                    @if ($search !== '' || $statusFilter !== 'all')
                         Nothing matches those filters.
                     @else
                         No hits recorded yet.

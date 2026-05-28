@@ -3,27 +3,27 @@
 namespace App\Services\Observatory;
 
 use App\Jobs\ConfirmWatchHitJob;
-use App\Models\PressRelease;
 use App\Models\PublicationItem;
 use App\Models\Source;
 use App\Models\Watch;
 use App\Models\WatchHit;
-use Illuminate\Support\Facades\DB;
 
 /**
- * Runs a watch's literal-term search across the visible corpus.
+ * Runs a watch's literal-term search across the team's visible corpus.
  *
- * Scope:
- *  - PublicationItems whose source is visible to the watch's team
- *    (union of global and team-scoped sources).
- *  - PressReleases for every company in the same team.
+ * Scope is intentionally narrow: PublicationItems whose source is
+ * visible to the watch's team (union of global and team-scoped
+ * sources). Press releases are excluded — the user's own PR archive
+ * isn't the kind of "outside world saying X" signal Observatory is
+ * designed to surface.
  *
- * Matching is case-insensitive whole-word against `title` and `body_text`.
- * On match, we upsert a WatchHit (unique on watch + content), grab a short
- * snippet, and bump the watch's denormalised counters.
+ * Matching is case-insensitive whole-word against `title` and
+ * `body_text`. On match, we upsert a WatchHit (unique on watch +
+ * content), grab a short snippet, and bump the watch's denormalised
+ * counters.
  *
- * When the watch's effective mode is literal_llm (team is entitled + the
- * user chose that mode), each newly-created hit is queued for LLM
+ * When the watch's effective mode is literal_llm (team is entitled +
+ * the user chose that mode), each newly-created hit is queued for LLM
  * confirmation in a follow-up job.
  */
 class WatchScanner
@@ -56,9 +56,7 @@ class WatchScanner
             return 0;
         }
 
-        $created = 0;
-        $created += $this->scanPublicationItems($watch, $team->id, $terms);
-        $created += $this->scanPressReleases($watch, $team->id, $terms);
+        $created = $this->scanPublicationItems($watch, $team->id, $terms);
 
         if ($created > 0) {
             $watch->forceFill([
@@ -88,34 +86,6 @@ class WatchScanner
                     $created += $this->matchAndRecord(
                         $watch,
                         WatchHit::TYPE_PUBLICATION_ITEM,
-                        $item->id,
-                        (string) $item->title,
-                        (string) $item->body_text,
-                        $terms,
-                    );
-                }
-            });
-
-        return $created;
-    }
-
-    private function scanPressReleases(Watch $watch, int $teamId, $terms): int
-    {
-        $companyIds = \App\Models\Company::where('team_id', $teamId)->pluck('id');
-
-        if ($companyIds->isEmpty()) {
-            return 0;
-        }
-
-        $created = 0;
-        PressRelease::query()
-            ->whereIn('company_id', $companyIds)
-            ->select(['id', 'title', 'body_text'])
-            ->chunkById(200, function ($items) use ($watch, $terms, &$created) {
-                foreach ($items as $item) {
-                    $created += $this->matchAndRecord(
-                        $watch,
-                        WatchHit::TYPE_PRESS_RELEASE,
                         $item->id,
                         (string) $item->title,
                         (string) $item->body_text,
