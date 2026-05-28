@@ -1,4 +1,7 @@
 <div>
+    {{-- Header slot is static after initial render (Jetstream renders it into
+         the layout once). So it only holds the breadcrumb / page title; the
+         reactive status indicator and action buttons live in the body. --}}
     <x-slot name="header">
         <div class="flex items-center justify-between w-full">
             <div class="min-w-0">
@@ -9,29 +12,44 @@
                 </div>
                 <h1 class="text-base font-semibold text-slate-900 mt-0.5">One-pager · {{ $match->publicationItem->source->name }}</h1>
             </div>
-            <div class="flex items-center gap-3">
-                <span class="text-xs text-slate-500">
-                    @if ($onePager->isPublished())
-                        <span class="inline-flex items-center gap-1.5">
-                            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                            Published · {{ $onePager->view_count }} {{ \Illuminate\Support\Str::plural('view', $onePager->view_count) }}
-                        </span>
-                    @else
-                        <span class="text-amber-700">Draft</span>
-                    @endif
-                </span>
-                @if ($onePager->isPublished())
-                    <button wire:click="unpublish" class="btn-secondary text-xs">Unpublish</button>
-                @endif
-                <button wire:click="save" class="btn-secondary">Save draft</button>
-                @if (! $onePager->isPublished())
-                    <button wire:click="publish" class="btn-primary">Publish</button>
-                @endif
-            </div>
         </div>
     </x-slot>
 
     <div class="max-w-6xl mx-auto space-y-6 animate-fade-in">
+        {{-- Reactive control bar — lives in the body so it updates after
+             wire:click actions. --}}
+        <div class="flex items-center justify-between gap-3 bg-white border border-slate-200 rounded-xl p-3 pl-4">
+            <div class="text-sm">
+                @if ($onePager->isPublished())
+                    <span class="inline-flex items-center gap-1.5 text-emerald-700 font-medium">
+                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Published
+                    </span>
+                    <span class="text-slate-400 mx-2">·</span>
+                    <span class="text-slate-600">{{ $onePager->view_count }} {{ \Illuminate\Support\Str::plural('view', $onePager->view_count) }}</span>
+                @else
+                    <span class="inline-flex items-center gap-1.5 text-amber-700 font-medium">
+                        <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                        Draft
+                    </span>
+                    <span class="text-slate-400 mx-2">·</span>
+                    <span class="text-slate-500">Not yet shareable</span>
+                @endif
+            </div>
+            <div class="flex items-center gap-2">
+                @if ($onePager->isPublished())
+                    <button wire:click="unpublish" wire:loading.attr="disabled" class="btn-secondary text-xs">Unpublish</button>
+                @endif
+                <button wire:click="save" wire:loading.attr="disabled" class="btn-secondary">Save draft</button>
+                @if (! $onePager->isPublished())
+                    <button wire:click="publish" wire:loading.attr="disabled" class="btn-primary">
+                        <span wire:loading.remove wire:target="publish">Publish</span>
+                        <span wire:loading wire:target="publish">Publishing…</span>
+                    </button>
+                @endif
+            </div>
+        </div>
+
         @if (session('status'))
             <div class="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-800">{{ session('status') }}</div>
         @endif
