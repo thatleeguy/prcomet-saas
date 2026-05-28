@@ -45,6 +45,48 @@ class Index extends Component
         }
     }
 
+    /**
+     * Clone a one-pager into a fresh draft.
+     *
+     * The clone is always created as standalone (no match_id) because
+     * MatchRecord has a hasOne to OnePager — keeping the original match
+     * bound to its existing page avoids breaking that contract. Title,
+     * note, and the asset selection are all copied. View counters reset
+     * to zero so engagement stats stay accurate for the new URL.
+     */
+    public function duplicate(int $onePagerId): void
+    {
+        $original = OnePager::query()
+            ->where('company_id', $this->company->id)
+            ->with('assets')
+            ->findOrFail($onePagerId);
+
+        $copy = OnePager::create([
+            'company_id' => $this->company->id,
+            'match_id' => null,
+            'created_by_id' => auth()->id(),
+            // Display title falls through original->title → headline → 'Untitled',
+            // so the copy always has a sensible label even if the source did not.
+            'title' => trim(($original->title ?? $original->displayTitle()).' (copy)'),
+            'note_md' => $original->note_md,
+            'status' => OnePager::STATUS_DRAFT,
+        ]);
+
+        // Re-attach the same asset selection in the same order.
+        $sync = [];
+        foreach ($original->assets as $i => $asset) {
+            $sync[$asset->id] = ['sort_order' => $i];
+        }
+        $copy->assets()->sync($sync);
+
+        session()->flash('status', 'Duplicated. Editing the new draft.');
+
+        $this->redirectRoute('companies.onepagers.edit', [
+            'company' => $this->company,
+            'onePager' => $copy,
+        ], navigate: true);
+    }
+
     public function setStatus(string $status): void
     {
         $this->statusFilter = $status;

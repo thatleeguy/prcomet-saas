@@ -50,6 +50,50 @@ it('filters by status', function () {
         ->assertDontSee('Headline-Draft');
 });
 
+it('duplicates a one-pager as a standalone draft with copied note and assets', function () {
+    $user = makeUserWithTeam(['is_active' => true]);
+    $company = Company::factory()->create(['team_id' => $user->currentTeam->id]);
+
+    $original = makeOnePagerFor($company, headline: 'Original headline', status: OnePager::STATUS_PUBLISHED);
+    $original->update(['title' => 'Hand-picked title', 'note_md' => 'Hi Robert, …']);
+
+    // Attach two assets via the pivot so we can verify they carry over.
+    $a1 = \App\Models\MediaAsset::factory()->image()->create(['company_id' => $company->id]);
+    $a2 = \App\Models\MediaAsset::factory()->image()->create(['company_id' => $company->id]);
+    $original->assets()->sync([
+        $a1->id => ['sort_order' => 0],
+        $a2->id => ['sort_order' => 1],
+    ]);
+
+    \Livewire\Livewire::actingAs($user)
+        ->test(\App\Livewire\OnePagers\Index::class, ['company' => $company])
+        ->call('duplicate', $original->id);
+
+    $copy = OnePager::where('company_id', $company->id)
+        ->where('id', '!=', $original->id)
+        ->first();
+
+    expect($copy)->not->toBeNull();
+    expect($copy->match_id)->toBeNull(); // copies are always standalone
+    expect($copy->status)->toBe(OnePager::STATUS_DRAFT);
+    expect($copy->title)->toBe('Hand-picked title (copy)');
+    expect($copy->note_md)->toBe('Hi Robert, …');
+    expect($copy->uuid)->not->toBe($original->uuid); // fresh public URL
+    expect($copy->view_count)->toBe(0); // engagement resets
+    expect($copy->assets->pluck('id')->all())->toEqual([$a1->id, $a2->id]);
+});
+
+it('refuses to duplicate a one-pager from another company', function () {
+    $user = makeUserWithTeam(['is_active' => true]);
+    $myCompany = Company::factory()->create(['team_id' => $user->currentTeam->id]);
+    $otherCompany = Company::factory()->create(); // independent team
+    $foreign = makeOnePagerFor($otherCompany, headline: 'Foreign');
+
+    \Livewire\Livewire::actingAs($user)
+        ->test(\App\Livewire\OnePagers\Index::class, ['company' => $myCompany])
+        ->call('duplicate', $foreign->id);
+})->throws(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+
 it('switches the current company on visit', function () {
     $user = makeUserWithTeam(['is_active' => true]);
     $a = Company::factory()->create(['team_id' => $user->currentTeam->id]);
@@ -82,6 +126,7 @@ function makeOnePagerFor(Company $company, string $headline, string $status = On
 
     return OnePager::factory()->create([
         'match_id' => $match->id,
+        'company_id' => $company->id, // factory default is a fresh Company, override.
         'status' => $status,
     ]);
 }
