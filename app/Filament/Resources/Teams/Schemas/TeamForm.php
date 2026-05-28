@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Teams\Schemas;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 
 class TeamForm
@@ -41,6 +42,10 @@ class TeamForm
                 DateTimePicker::make('paid_through_at')
                     ->label('Paid through')
                     ->helperText('Optional. Used as a soft reminder; does not auto-suspend.'),
+
+                Toggle::make('llm_observatory_enabled')
+                    ->label('Observatory LLM confirmation')
+                    ->helperText('Unlocks the literal+LLM matching mode on watches. Per-hit cost; toggle when an account upgrades.'),
             ]);
     }
 }

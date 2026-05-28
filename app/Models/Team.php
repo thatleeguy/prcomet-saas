@@ -32,6 +32,7 @@ class Team extends JetstreamTeam
         'activated_by_id',
         'billing_notes',
         'paid_through_at',
+        'llm_observatory_enabled',
     ];
 
     /**
@@ -58,7 +59,19 @@ class Team extends JetstreamTeam
             'max_companies' => 'integer',
             'activated_at' => 'datetime',
             'paid_through_at' => 'datetime',
+            'llm_observatory_enabled' => 'boolean',
         ];
+    }
+
+    /**
+     * Is the team entitled to the LLM-confirmation upgrade on Observatory
+     * watches? Drives both the UI surface (the upgrade CTA disappears when
+     * true) and the scan engine (literal_llm watches downgrade to literal
+     * when this returns false).
+     */
+    public function llmObservatoryEnabled(): bool
+    {
+        return (bool) $this->llm_observatory_enabled;
     }
 
     /**

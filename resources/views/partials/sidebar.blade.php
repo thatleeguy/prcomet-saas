@@ -157,6 +157,7 @@
                 'images'   => 'M4 7a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V7zM4 15l4-4 4 4 4-4 4 4M9 9a1 1 0 100-2 1 1 0 000 2z',
                 'palette'  => 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c1.1 0 2-.9 2-2 0-.51-.2-.97-.51-1.32-.3-.35-.49-.81-.49-1.31 0-1.1.9-2 2-2h2c2.76 0 5-2.24 5-5 0-4.96-4.48-9-10-9zM6.5 12a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm3-4a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm3 4a1.5 1.5 0 100-3 1.5 1.5 0 000 3z',
                 'onepager' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4',
+                'observatory' => 'M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z',
             ];
         @endphp
 
@@ -179,11 +180,18 @@
             @if ($currentCompany)
                 <div class="px-3 mb-2 mt-6 text-xs font-medium text-slate-400 uppercase tracking-wider">{{ \Illuminate\Support\Str::limit($currentCompany->name, 22) }}</div>
                 <a href="{{ route('companies.onepagers', $currentCompany) }}" wire:navigate
-                   class="nav-link {{ request()->routeIs('companies.onepagers') || request()->routeIs('matches.one-pager') ? 'nav-link-active' : '' }}">
+                   class="nav-link {{ request()->routeIs('companies.onepagers*') || request()->routeIs('matches.one-pager') ? 'nav-link-active' : '' }}">
                     <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
                         <path d="{{ $icons['onepager'] }}" />
                     </svg>
                     <span class="flex-1">One-pagers</span>
+                </a>
+                <a href="{{ route('companies.observatory', $currentCompany) }}" wire:navigate
+                   class="nav-link {{ request()->routeIs('companies.observatory*') ? 'nav-link-active' : '' }}">
+                    <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                        <path d="{{ $icons['observatory'] }}" />
+                    </svg>
+                    <span class="flex-1">Observatory</span>
                 </a>
                 <a href="{{ route('companies.library', $currentCompany) }}" wire:navigate
                    class="nav-link {{ request()->routeIs('companies.library*') ? 'nav-link-active' : '' }}">

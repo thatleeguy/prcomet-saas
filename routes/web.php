@@ -69,6 +69,12 @@ Route::middleware([
         // pages. The component scopes by company_id at mount.
         Route::get('/companies/{company}/onepagers/{onePager:uuid}', Livewire\OnePagers\Edit::class)
             ->name('companies.onepagers.edit');
+
+        // Observatory — watches + hits feed.
+        Route::get('/companies/{company}/observatory', Livewire\Observatory\Index::class)->name('companies.observatory');
+        Route::get('/companies/{company}/observatory/create', Livewire\Observatory\Edit::class)->name('companies.observatory.create');
+        Route::get('/companies/{company}/observatory/{watch}', Livewire\Observatory\Show::class)->name('companies.observatory.show');
+        Route::get('/companies/{company}/observatory/{watch}/edit', Livewire\Observatory\Edit::class)->name('companies.observatory.edit');
         Route::get('/companies/{company}/branding', Livewire\Companies\Branding::class)->name('companies.branding');
 
         Route::get('/matches', Livewire\Matches\Index::class)->name('matches.index');
