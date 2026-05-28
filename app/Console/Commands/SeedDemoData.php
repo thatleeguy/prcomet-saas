@@ -43,7 +43,8 @@ class SeedDemoData extends Command
 {
     protected $signature = 'app:seed-demo
         {--email= : Existing user email whose team should receive the demo data}
-        {--password=demo-password : Password to set if creating the default demo user}';
+        {--password=demo-password : Password to set if creating the default demo user}
+        {--observatory-only : Only seed Observatory watches against the existing Aurelian company; leaves everything else alone}';
 
     protected $description = 'Populate the workspace with a fictional JMC and a full set of matches across all statuses';
 
@@ -52,6 +53,24 @@ class SeedDemoData extends Command
         DB::transaction(function () {
             $user = $this->resolveUser();
             $team = $this->resolveTeam($user);
+
+            if ($this->option('observatory-only')) {
+                $this->info("Seeding Observatory watches into team {$team->name} (id {$team->id})…");
+                $company = Company::where('team_id', $team->id)
+                    ->where('name', 'Aurelian Gold Resources Corp')
+                    ->first();
+
+                if (! $company) {
+                    $this->error('No "Aurelian Gold Resources Corp" company found on this team — run the full seeder first.');
+                    return;
+                }
+
+                // Wipe any prior watches on this company so re-runs are clean.
+                Watch::where('company_id', $company->id)->delete();
+                $this->seedObservatory($team, $company, $user);
+                $this->info("Done. Visit /dashboard/companies/{$company->id}/observatory");
+                return;
+            }
 
             $this->info("Seeding demo data into team {$team->name} (id {$team->id})…");
 
