@@ -21,6 +21,22 @@
     <body class="font-sans antialiased text-slate-900">
         <x-banner />
 
+        @if (session('impersonator_id'))
+            <div class="sticky top-0 z-40 bg-amber-500 text-white px-4 py-2 text-sm flex items-center justify-center gap-3 shadow">
+                <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span>
+                    You're impersonating
+                    <strong>{{ Auth::user()->name }}</strong>.
+                </span>
+                <form method="POST" action="{{ route('impersonate.stop') }}" class="inline">
+                    @csrf
+                    <button type="submit" class="ml-1 underline underline-offset-2 hover:no-underline font-medium">
+                        Return to admin
+                    </button>
+                </form>
+            </div>
+        @endif
+
         <div class="min-h-screen flex">
             {{-- Sidebar nav — fixed on desktop, slide-over on mobile. --}}
             @include('partials.sidebar')

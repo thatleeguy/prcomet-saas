@@ -58,6 +58,23 @@ class MatchRecord extends Model
         ];
     }
 
+    protected static function booted(): void
+    {
+        // Auto-create a draft OnePager the moment a match leaves "new" status
+        // for the first time (saved/contacted/placed). Dismissed matches don't
+        // get one — they're rejected, no outreach is happening.
+        static::updated(function (MatchRecord $match) {
+            if (! $match->wasChanged('status')) {
+                return;
+            }
+            $newStatus = $match->status;
+            if (! in_array($newStatus, [self::STATUS_SAVED, self::STATUS_CONTACTED, self::STATUS_PLACED], true)) {
+                return;
+            }
+            $match->ensureOnePager();
+        });
+    }
+
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
@@ -81,5 +98,26 @@ class MatchRecord extends Model
     public function events(): HasMany
     {
         return $this->hasMany(MatchEvent::class, 'match_id');
+    }
+
+    public function onePager(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(OnePager::class, 'match_id');
+    }
+
+    /**
+     * Lazily ensure a one-pager exists for this match (in draft) and return it.
+     * Called from the UI when the user wants to view/edit/share.
+     */
+    public function ensureOnePager(?int $createdByUserId = null): OnePager
+    {
+        return $this->onePager()->firstOrCreate(
+            [],
+            [
+                'company_id' => $this->company_id,
+                'created_by_id' => $createdByUserId,
+                'status' => OnePager::STATUS_DRAFT,
+            ]
+        );
     }
 }

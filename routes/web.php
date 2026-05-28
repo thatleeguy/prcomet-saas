@@ -15,6 +15,16 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Public one-pager. UUID-keyed; published-only renders. Tracking happens in the controller.
+Route::get('/onepagers/{uuid}', [\App\Http\Controllers\OnePagerController::class, 'show'])
+    ->name('onepagers.show');
+
+// Stop impersonating. Available to any authenticated user since the
+// impersonated user is the one signed in here; controller verifies state.
+Route::post('/impersonate/stop', [\App\Http\Controllers\ImpersonationController::class, 'stop'])
+    ->middleware('auth')
+    ->name('impersonate.stop');
+
 /*
 |--------------------------------------------------------------------------
 | Workspace
@@ -41,9 +51,12 @@ Route::middleware([
         Route::get('/companies/{company}', Livewire\Companies\Show::class)->name('companies.show');
         Route::get('/companies/{company}/edit', Livewire\Companies\Edit::class)->name('companies.edit');
         Route::get('/companies/{company}/matches', Livewire\Matches\Index::class)->name('companies.matches');
+        Route::get('/companies/{company}/library', Livewire\Companies\MediaLibrary::class)->name('companies.library');
+        Route::get('/companies/{company}/branding', Livewire\Companies\Branding::class)->name('companies.branding');
 
         Route::get('/matches', Livewire\Matches\Index::class)->name('matches.index');
         Route::get('/matches/{match}', Livewire\Matches\Show::class)->name('matches.show');
+        Route::get('/matches/{match}/one-pager', Livewire\OnePagers\Edit::class)->name('matches.one-pager');
 
         Route::get('/wins', Livewire\Wins\Index::class)->name('wins.index');
 

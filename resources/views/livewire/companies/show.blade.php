@@ -2,8 +2,11 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ $company->name }}</h2>
-            <a href="{{ route('companies.edit', $company) }}" wire:navigate
-                class="text-sm text-amber-700 hover:text-amber-900">Edit</a>
+            <div class="flex items-center gap-3 text-sm">
+                <a href="{{ route('companies.library', $company) }}" wire:navigate class="text-brand-700 hover:text-brand-800">Media library →</a>
+                <a href="{{ route('companies.branding', $company) }}" wire:navigate class="text-brand-700 hover:text-brand-800">Branding →</a>
+                <a href="{{ route('companies.edit', $company) }}" wire:navigate class="text-slate-600 hover:text-slate-900">Edit</a>
+            </div>
         </div>
     </x-slot>
 

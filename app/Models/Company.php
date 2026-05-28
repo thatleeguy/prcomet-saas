@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * A monitored entity — a Junior Mining Company in the v0 wedge, but the
@@ -14,6 +15,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *
  * Belongs to a Team (one customer). Team's `max_companies` enforces the seat
  * count at creation time via {@see Team::canAddCompany()}.
+ *
+ * Branding fields (logo, header, accent color, tagline, etc.) feed the
+ * one-pager renderer. They live on the Company, not the OnePager, so a brand
+ * refresh propagates to every page automatically.
  */
 class Company extends Model
 {
@@ -34,6 +39,14 @@ class Company extends Model
         'sector_tags',
         'is_active',
         'last_ingested_at',
+        // Branding
+        'logo_path',
+        'header_image_path',
+        'accent_color',
+        'tagline',
+        'description_md',
+        'press_contact_email',
+        'social_links',
     ];
 
     protected function casts(): array
@@ -41,6 +54,7 @@ class Company extends Model
         return [
             'secondary_feeds' => 'array',
             'sector_tags' => 'array',
+            'social_links' => 'array',
             'is_active' => 'boolean',
             'last_ingested_at' => 'datetime',
         ];
@@ -54,5 +68,29 @@ class Company extends Model
     public function pressReleases(): HasMany
     {
         return $this->hasMany(PressRelease::class);
+    }
+
+    public function mediaAssets(): HasMany
+    {
+        return $this->hasMany(MediaAsset::class);
+    }
+
+    public function onePagers(): HasMany
+    {
+        return $this->hasMany(OnePager::class);
+    }
+
+    public function logoUrl(): ?string
+    {
+        return $this->logo_path
+            ? Storage::disk(config('filesystems.default'))->url($this->logo_path)
+            : null;
+    }
+
+    public function headerImageUrl(): ?string
+    {
+        return $this->header_image_path
+            ? Storage::disk(config('filesystems.default'))->url($this->header_image_path)
+            : null;
     }
 }
