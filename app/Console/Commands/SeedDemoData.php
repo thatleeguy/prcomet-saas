@@ -15,6 +15,9 @@ use App\Models\PublicationItem;
 use App\Models\Source;
 use App\Models\Team;
 use App\Models\User;
+use App\Models\Watch;
+use App\Models\WatchHit;
+use App\Services\Observatory\WatchScanner;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -65,6 +68,7 @@ class SeedDemoData extends Command
 
             $this->seedMediaAssets($company, $releases);
             $onePager = $this->seedOnePager($matches['placed'], $company, $user);
+            $this->seedObservatory($team, $company, $user);
 
             $this->printSummary($user, $team, $company, $onePager);
         });
@@ -132,6 +136,12 @@ class SeedDemoData extends Command
         Company::where('team_id', $team->id)
             ->where('name', 'Aurelian Gold Resources Corp')
             ->delete();
+
+        // Publication items are global (sourced from team-visible sources, not
+        // owned by a company), so they don't cascade with the company delete.
+        // Wipe anything previously stamped by this seeder so re-runs don't
+        // accumulate duplicate Walker Lane hits, etc.
+        PublicationItem::where('external_guid', 'like', 'demo-%')->delete();
     }
 
     private function ensureSourceCorpus(): void
@@ -886,6 +896,76 @@ SVG;
         return $onePager;
     }
 
+    /**
+     * Three watches to show off the Observatory:
+     *
+     *   - Walker Lane (location, literal+LLM) — busy watch with a mix of
+     *     confirmed / pending / rejected hits so the LLM verdict UI has
+     *     content to render.
+     *   - Carlin Trend (location, literal) — fewer hits, all unconfirmed
+     *     because the watch is literal-only.
+     *   - Newmont (company, literal) — zero hits, shows the empty-state
+     *     panel on the watch detail page.
+     *
+     * Enables the team's llm_observatory_enabled flag so the LLM-mode
+     * watch actually runs in LLM mode for the demo. Flip it off in
+     * Filament to see the downgrade/upgrade UI.
+     */
+    private function seedObservatory(Team $team, Company $company, User $user): void
+    {
+        $team->forceFill(['llm_observatory_enabled' => true])->save();
+
+        // Compose-and-scan helper.
+        $build = function (array $attrs) use ($company, $user): Watch {
+            return Watch::create(array_merge([
+                'company_id' => $company->id,
+                'created_by_user_id' => $user->id,
+                'is_active' => true,
+            ], $attrs));
+        };
+
+        $scanner = app(WatchScanner::class);
+
+        // ── Walker Lane: busy + LLM-confirmed ────────────────────────
+        $walkerLane = $build([
+            'name' => 'Walker Lane',
+            'kind' => Watch::KIND_LOCATION,
+            'terms' => ['Walker Lane', 'Walker Lane trend', 'Walker Lane belt'],
+            'mode' => Watch::MODE_LITERAL_LLM,
+        ]);
+        $scanner->scan($walkerLane);
+
+        // Annotate the hits with a realistic mix instead of dispatching the
+        // real LLM job — demo seeding shouldn't depend on an API key.
+        $walkerHits = $walkerLane->hits()->orderBy('id')->get();
+        foreach ($walkerHits as $i => $hit) {
+            // First two confirmed, third left pending so the UI shows both states.
+            if ($i < 2) {
+                $hit->forceFill([
+                    'confirmed_by_llm' => true,
+                    'llm_reasoning' => 'Snippet clearly references the Walker Lane structural belt in the geological sense.',
+                ])->save();
+            }
+        }
+
+        // ── Carlin Trend: literal-only ───────────────────────────────
+        $carlin = $build([
+            'name' => 'Carlin Trend',
+            'kind' => Watch::KIND_LOCATION,
+            'terms' => ['Carlin Trend', 'Carlin trends', 'Carlin'],
+            'mode' => Watch::MODE_LITERAL,
+        ]);
+        $scanner->scan($carlin);
+
+        // ── Newmont: no hits expected (none of the seed items mention it).
+        $build([
+            'name' => 'Newmont',
+            'kind' => Watch::KIND_COMPANY,
+            'terms' => ['Newmont', 'Newmont Mining', 'Newmont Goldcorp', 'NEM'],
+            'mode' => Watch::MODE_LITERAL_LLM,
+        ]);
+    }
+
     private function printSummary(User $user, Team $team, Company $company, OnePager $onePager): void
     {
         $this->newLine();
@@ -901,6 +981,7 @@ SVG;
         $this->line('  - <fg=yellow>/dashboard/companies/'.$company->id.'</> — 4 press releases');
         $this->line('  - <fg=yellow>/dashboard/companies/'.$company->id.'/library</> — media library with 6 assets');
         $this->line('  - <fg=yellow>/dashboard/companies/'.$company->id.'/branding</> — logo + header + colors');
+        $this->line('  - <fg=yellow>/dashboard/companies/'.$company->id.'/observatory</> — 3 watches, mix of LLM-confirmed + literal');
         $this->line('  - <fg=yellow>/dashboard/matches</> — 3 new, 1 contacted, 1 placed, 1 dismissed');
         $this->line('  - <fg=yellow>/dashboard/wins</> — the placed match');
         $this->line('  - <fg=cyan>/onepagers/'.$onePager->uuid.'</> — public one-pager (no auth)');
