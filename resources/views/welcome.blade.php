@@ -32,6 +32,7 @@
                 <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
                     <a href="#how" class="hover:text-slate-900 transition-colors">How it works</a>
                     <a href="#brief" class="hover:text-slate-900 transition-colors">The brief</a>
+                    <a href="#send" class="hover:text-slate-900 transition-colors">The send</a>
                     <a href="#for-whom" class="hover:text-slate-900 transition-colors">Who it's for</a>
                 </nav>
 
@@ -404,6 +405,158 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {{-- ─────────────────────────────────────────────────────────────
+              THE SEND · media library + one-pager
+          ───────────────────────────────────────────────────────────── --}}
+        <section id="send" class="bg-slate-50 border-y border-slate-200/70 py-20 lg:py-28">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+
+                {{-- Mockup column: a one-pager preview with branded header,
+                     pull quote, asset thumbnails, and an engagement strip.
+                     The whole thing leans on company-branding cues so the
+                     reader instantly groks "this is what the journalist sees." --}}
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2 text-xs text-slate-500 px-2 font-mono">
+                        <svg class="h-3.5 w-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+                        prcomet.com/onepagers/<span class="text-indigo-700">a48f…2c</span>
+                    </div>
+
+                    <div class="rounded-2xl border border-slate-200 bg-white shadow-xl overflow-hidden">
+                        {{-- Branded header strip --}}
+                        <div class="relative h-24 bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500">
+                            <div class="absolute inset-0 opacity-30" style="background-image: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.4) 0%, transparent 50%), radial-gradient(circle at 80% 30%, rgba(255,255,255,0.3) 0%, transparent 50%);"></div>
+                            <div class="absolute bottom-3 left-5 right-5 flex items-end justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="grid place-items-center h-9 w-9 rounded-lg bg-white text-amber-700 font-bold text-sm shadow">AU</div>
+                                    <div class="text-white">
+                                        <div class="font-semibold text-sm leading-tight">Aurelian Gold Resources</div>
+                                        <div class="text-[10px] text-white/80">TSX-V: AUG · Nevada gold exploration</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-5 lg:p-6 space-y-5">
+                            {{-- Personal note --}}
+                            <div class="text-sm text-slate-700 leading-relaxed">
+                                Hi Robert — given your Walker Lane coverage, thought you'd find our latest intercept at Big Sky worth a look. Full assay table below, plus a 60-second call with our VP Exploration if helpful.
+                            </div>
+
+                            {{-- Pull quote --}}
+                            <div class="rounded-xl bg-gradient-to-br from-indigo-50 via-violet-50 to-fuchsia-50 border border-indigo-100 p-4">
+                                <svg class="h-4 w-4 text-indigo-500 mb-1.5" fill="currentColor" viewBox="0 0 24 24"><path d="M9.983 3v7.391c0 5.704-3.731 9.57-8.983 10.609l-.995-2.151c2.432-.917 3.995-3.638 3.995-5.849h-4v-10h9.983zm14.017 0v7.391c0 5.704-3.748 9.571-9 10.609l-.996-2.151c2.433-.917 3.996-3.638 3.996-5.849h-3.983v-10h9.983z"/></svg>
+                                <p class="text-sm text-slate-800 italic leading-relaxed">"This intercept extends the high-grade zone by 200 metres along strike and confirms the system is open at depth."</p>
+                                <div class="text-[10px] text-indigo-700 mt-2 font-medium">— Sarah Chen, VP Exploration</div>
+                            </div>
+
+                            {{-- Asset thumbnails --}}
+                            <div>
+                                <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Materials</div>
+                                <div class="grid grid-cols-4 gap-2">
+                                    {{-- Drill core image --}}
+                                    <div class="aspect-square rounded-lg bg-gradient-to-br from-stone-300 via-amber-200 to-stone-400 border border-slate-200 overflow-hidden relative">
+                                        <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-stone-700/60 to-transparent"></div>
+                                        <div class="absolute bottom-1 left-1.5 text-[9px] text-white font-medium">Drill core</div>
+                                    </div>
+                                    {{-- Map --}}
+                                    <div class="aspect-square rounded-lg bg-gradient-to-br from-emerald-100 via-teal-100 to-slate-100 border border-slate-200 overflow-hidden relative">
+                                        <svg class="absolute inset-0 w-full h-full" viewBox="0 0 40 40" preserveAspectRatio="none"><path d="M0 25 Q10 15 20 22 T40 18" fill="none" stroke="rgb(13 148 136 / 0.5)" stroke-width="1"/><path d="M0 32 Q15 22 25 28 T40 25" fill="none" stroke="rgb(13 148 136 / 0.4)" stroke-width="1"/><circle cx="22" cy="20" r="1.5" fill="rgb(220 38 38)"/></svg>
+                                        <div class="absolute bottom-1 left-1.5 text-[9px] text-slate-700 font-medium">Geology map</div>
+                                    </div>
+                                    {{-- PDF --}}
+                                    <div class="aspect-square rounded-lg bg-rose-50 border border-rose-100 grid place-items-center relative">
+                                        <svg class="h-7 w-7 text-rose-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                        <div class="absolute bottom-1 left-1.5 text-[9px] text-rose-700 font-medium">NI 43-101</div>
+                                    </div>
+                                    {{-- Link --}}
+                                    <div class="aspect-square rounded-lg bg-indigo-50 border border-indigo-100 grid place-items-center relative">
+                                        <svg class="h-7 w-7 text-indigo-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+                                        <div class="absolute bottom-1 left-1.5 text-[9px] text-indigo-700 font-medium">Corp deck</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Engagement strip (what the sender sees on their side) --}}
+                        <div class="px-5 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <div class="flex items-center gap-1.5 text-slate-600">
+                                <span class="relative flex h-1.5 w-1.5">
+                                    <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-60 animate-ping"></span>
+                                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                                </span>
+                                <span class="font-medium text-emerald-700">Opened</span>
+                                <span class="text-slate-400">·</span>
+                                <span>3 views · 12 min ago</span>
+                            </div>
+                            <span class="text-slate-400 font-mono text-[10px]">Robert Sinclair</span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Copy column --}}
+                <div class="space-y-6">
+                    <p class="text-xs font-semibold text-indigo-600 uppercase tracking-wider">The send</p>
+                    <h2 class="text-3xl lg:text-4xl font-semibold text-slate-900 tracking-tight [text-wrap:balance]">
+                        Send a story, not a thread of attachments.
+                    </h2>
+                    <p class="text-lg text-slate-600 leading-relaxed">
+                        Once you've decided which writer to reach out to, PrComet builds them a single branded page with everything they need to actually run the story. No 12 MB email. No "let me know if you want photos." Paste a link, get a response.
+                    </p>
+
+                    <ul class="space-y-5 pt-2">
+                        <li class="flex gap-3">
+                            <span class="grid place-items-center h-6 w-6 rounded-md bg-indigo-100 text-indigo-700 shrink-0 mt-0.5">
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V7zM4 15l4-4 4 4 4-4 4 4M9 9a1 1 0 100-2 1 1 0 000 2z" /></svg>
+                            </span>
+                            <div>
+                                <div class="text-sm font-semibold text-slate-900">A media library, organized once</div>
+                                <p class="text-sm text-slate-600 leading-relaxed mt-0.5">
+                                    Drill core photos, NI 43-101s, executive bios, pull quotes from past coverage. Upload it once, tag it, and PrComet pulls the right pieces onto each one-pager automatically.
+                                </p>
+                            </div>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="grid place-items-center h-6 w-6 rounded-md bg-violet-100 text-violet-700 shrink-0 mt-0.5">
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            </span>
+                            <div>
+                                <div class="text-sm font-semibold text-slate-900">Auto-curated, then tweakable</div>
+                                <p class="text-sm text-slate-600 leading-relaxed mt-0.5">
+                                    Tags on each asset get matched to the story's topics — drill results pull photos and the technical report, financings pull the deck and last earnings transcript. Override anything in one click.
+                                </p>
+                            </div>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="grid place-items-center h-6 w-6 rounded-md bg-fuchsia-100 text-fuchsia-700 shrink-0 mt-0.5">
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                            </span>
+                            <div>
+                                <div class="text-sm font-semibold text-slate-900">Knowing when they opened it</div>
+                                <p class="text-sm text-slate-600 leading-relaxed mt-0.5">
+                                    Every view is logged with timestamps. "Sinclair opened it twice yesterday" is the cue to follow up. Not the cold pitch. Not the silent void.
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div class="pt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-slate-500">
+                        <span class="flex items-center gap-1.5">
+                            <svg class="h-3.5 w-3.5 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Your branding, your accent color
+                        </span>
+                        <span class="flex items-center gap-1.5">
+                            <svg class="h-3.5 w-3.5 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            One link, mobile-ready
+                        </span>
+                        <span class="flex items-center gap-1.5">
+                            <svg class="h-3.5 w-3.5 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Unpublish anytime
+                        </span>
                     </div>
                 </div>
             </div>
