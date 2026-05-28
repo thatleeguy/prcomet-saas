@@ -60,6 +60,15 @@ Route::middleware([
         Route::get('/companies/{company}/library/create', Livewire\Companies\MediaAssetEdit::class)->name('companies.library.create');
         Route::get('/companies/{company}/library/{asset}/edit', Livewire\Companies\MediaAssetEdit::class)->name('companies.library.edit');
         Route::get('/companies/{company}/onepagers', Livewire\OnePagers\Index::class)->name('companies.onepagers');
+        // Create a standalone one-pager (no match) — the controller stamps
+        // a draft row and redirects into the editor. POST so a refresh
+        // doesn't spawn dupes.
+        Route::post('/companies/{company}/onepagers', [\App\Http\Controllers\OnePagerCreateController::class, 'store'])
+            ->name('companies.onepagers.store');
+        // UUID-keyed edit URL — works for both standalone and match-bound
+        // pages. The component scopes by company_id at mount.
+        Route::get('/companies/{company}/onepagers/{onePager:uuid}', Livewire\OnePagers\Edit::class)
+            ->name('companies.onepagers.edit');
         Route::get('/companies/{company}/branding', Livewire\Companies\Branding::class)->name('companies.branding');
 
         Route::get('/matches', Livewire\Matches\Index::class)->name('matches.index');

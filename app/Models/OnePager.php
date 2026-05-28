@@ -34,6 +34,7 @@ class OnePager extends Model
         'uuid',
         'match_id',
         'company_id',
+        'title',
         'created_by_id',
         'note_md',
         'status',
@@ -102,5 +103,32 @@ class OnePager extends Model
     public function publicUrl(): string
     {
         return route('onepagers.show', $this->uuid);
+    }
+
+    /**
+     * Did this page originate from a match, or was it created standalone?
+     * Used by the editor view to decide whether to show match-context
+     * (target journalist, score, suggested angle) or a title field.
+     */
+    public function isStandalone(): bool
+    {
+        return $this->match_id === null;
+    }
+
+    /**
+     * Human label for the page in lists and breadcrumbs. Falls back through
+     * the saved title, the originating match's headline, and finally a
+     * generic placeholder so the UI never shows blank.
+     */
+    public function displayTitle(): string
+    {
+        if (filled($this->title)) {
+            return $this->title;
+        }
+
+        $headline = $this->match?->publicationItem?->title
+            ?? $this->match?->pressRelease?->title;
+
+        return $headline ?? 'Untitled one-pager';
     }
 }

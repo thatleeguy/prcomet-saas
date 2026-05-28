@@ -6,11 +6,20 @@
         <div class="flex items-center justify-between w-full">
             <div class="min-w-0">
                 <div class="flex items-center gap-2 text-xs text-slate-500">
-                    <a href="{{ route('matches.show', $match) }}" wire:navigate class="hover:text-slate-900">Match</a>
+                    <a href="{{ route('companies.onepagers', $company) }}" wire:navigate class="hover:text-slate-900">One-pagers</a>
                     <span class="text-slate-300">/</span>
-                    <span class="text-slate-700">One-pager</span>
+                    @if ($match)
+                        <a href="{{ route('matches.show', $match) }}" wire:navigate class="hover:text-slate-900">Match</a>
+                        <span class="text-slate-300">/</span>
+                    @endif
+                    <span class="text-slate-700">{{ \Illuminate\Support\Str::limit($onePager->displayTitle(), 50) }}</span>
                 </div>
-                <h1 class="text-base font-semibold text-slate-900 mt-0.5">One-pager · {{ $match->publicationItem->source->name }}</h1>
+                <h1 class="text-base font-semibold text-slate-900 mt-0.5 truncate">
+                    {{ $onePager->displayTitle() }}
+                    @if (! $match)
+                        <span class="ml-2 inline-flex items-center gap-1 align-middle px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-medium uppercase tracking-wider">Standalone</span>
+                    @endif
+                </h1>
             </div>
         </div>
     </x-slot>
@@ -66,10 +75,24 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2 space-y-6">
+
+                {{-- Title only matters for standalone pages — match-bound ones
+                     derive their headline from the press release. --}}
+                @if (! $match)
+                    <section class="bg-white border border-slate-200 rounded-xl p-6">
+                        <label class="block text-sm font-semibold text-slate-900 mb-2">Title</label>
+                        <p class="text-xs text-slate-500 mb-3">Just for the workspace — recipients see your branded page, not this label.</p>
+                        <input type="text" wire:model.blur="title" maxlength="200"
+                               placeholder="Aurelian Gold — investor introduction, Q2 2026"
+                               class="w-full rounded-md border-slate-200 text-sm focus:border-brand-500 focus:ring-brand-500" />
+                        @error('title') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                    </section>
+                @endif
+
                 <section class="bg-white border border-slate-200 rounded-xl p-6">
                     <label class="block text-sm font-semibold text-slate-900 mb-2">Personal note</label>
                     <p class="text-xs text-slate-500 mb-3">Appears at the top of the page, above the assets. Markdown supported.</p>
-                    <textarea wire:model="note" rows="5" placeholder="Hey Robert, thought you'd find our latest drill results interesting given your Walker Lane coverage..."
+                    <textarea wire:model="note" rows="5" placeholder="@if ($match)Hey Robert, thought you'd find our latest drill results interesting given your Walker Lane coverage...@else A short intro shown above the materials. Tell the reader what they're looking at and why it matters. @endif"
                               class="w-full rounded-md border-slate-200 text-sm focus:border-brand-500 focus:ring-brand-500"></textarea>
                 </section>
 
@@ -79,12 +102,12 @@
                             <h2 class="text-sm font-semibold text-slate-900">Included assets</h2>
                             <p class="text-xs text-slate-500 mt-0.5">Click to toggle. Curated automatically by tag overlap; tweak as needed.</p>
                         </div>
-                        <a href="{{ route('companies.library', $match->company) }}" wire:navigate class="text-xs text-brand-700 hover:text-brand-800">Manage library →</a>
+                        <a href="{{ route('companies.library', $company) }}" wire:navigate class="text-xs text-brand-700 hover:text-brand-800">Manage library →</a>
                     </div>
 
                     @if ($this->libraryAssets->isEmpty())
                         <div class="rounded-lg border-2 border-dashed border-slate-200 p-8 text-center">
-                            <p class="text-sm text-slate-500">The media library is empty. <a href="{{ route('companies.library', $match->company) }}" wire:navigate class="text-brand-700 hover:underline">Add some assets</a> to include them here.</p>
+                            <p class="text-sm text-slate-500">The media library is empty. <a href="{{ route('companies.library', $company) }}" wire:navigate class="text-brand-700 hover:underline">Add some assets</a> to include them here.</p>
                         </div>
                     @else
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -127,14 +150,24 @@
             </div>
 
             <aside class="space-y-6">
-                <section class="bg-white border border-slate-200 rounded-xl p-5 text-sm">
-                    <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">For this match</h3>
-                    <div class="space-y-2 text-slate-700">
-                        <div><span class="text-slate-500">Triggered by:</span> {{ \Illuminate\Support\Str::limit($match->pressRelease->title, 60) }}</div>
-                        <div><span class="text-slate-500">Target:</span> {{ $match->author?->name ?? $match->publicationItem->source->name }}</div>
-                        <div><span class="text-slate-500">Match score:</span> <span class="font-semibold">{{ number_format($match->score * 100) }}%</span></div>
-                    </div>
-                </section>
+                @if ($match)
+                    <section class="bg-white border border-slate-200 rounded-xl p-5 text-sm">
+                        <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">For this match</h3>
+                        <div class="space-y-2 text-slate-700">
+                            <div><span class="text-slate-500">Triggered by:</span> {{ \Illuminate\Support\Str::limit($match->pressRelease->title, 60) }}</div>
+                            <div><span class="text-slate-500">Target:</span> {{ $match->author?->name ?? $match->publicationItem->source->name }}</div>
+                            <div><span class="text-slate-500">Match score:</span> <span class="font-semibold">{{ number_format($match->score * 100) }}%</span></div>
+                        </div>
+                    </section>
+                @else
+                    <section class="bg-white border border-slate-200 rounded-xl p-5 text-sm">
+                        <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Standalone page</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            This page isn't bound to a specific match — use it for an evergreen company introduction, an analyst deck, or anything you want a shareable link for.
+                        </p>
+                        <p class="text-xs text-slate-500 mt-2">Asset curation is fully manual; there are no match signals to auto-rank against.</p>
+                    </section>
+                @endif
 
                 <section class="bg-white border border-slate-200 rounded-xl p-5">
                     <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Engagement</h3>
@@ -159,7 +192,7 @@
 
                 <section class="bg-white border border-slate-200 rounded-xl p-5 text-xs text-slate-600 leading-relaxed">
                     <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Branding</h3>
-                    <p>The page uses the company's <a href="{{ route('companies.branding', $match->company) }}" wire:navigate class="text-brand-700 hover:underline">brand settings</a> — logo, header, accent color, contact details.</p>
+                    <p>The page uses the company's <a href="{{ route('companies.branding', $company) }}" wire:navigate class="text-brand-700 hover:underline">brand settings</a> — logo, header, accent color, contact details.</p>
                 </section>
             </aside>
         </div>

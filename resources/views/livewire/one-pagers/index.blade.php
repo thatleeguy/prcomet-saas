@@ -9,6 +9,13 @@
                 </div>
                 <h1 class="text-base font-semibold text-slate-900 mt-0.5">One-pagers</h1>
             </div>
+            <form method="POST" action="{{ route('companies.onepagers.store', $company) }}">
+                @csrf
+                <button type="submit" class="btn-primary inline-flex items-center gap-1.5">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                    New one-pager
+                </button>
+            </form>
         </div>
     </x-slot>
 
@@ -62,17 +69,28 @@
                     @if ($search !== '' || $statusFilter !== 'all')
                         Try widening the search, or clear the filter.
                     @else
-                        One-pagers are created automatically as soon as you start working on a match. Head to <a href="{{ route('matches.index') }}" wire:navigate class="text-brand-700 hover:underline">Matches</a> and save one.
+                        One-pagers are created automatically as soon as you act on a match, or you can start a blank one — useful for an evergreen company introduction or analyst deck.
                     @endif
                 </p>
+                @if ($search === '' && $statusFilter === 'all')
+                    <div class="mt-5 flex items-center justify-center gap-2">
+                        <a href="{{ route('matches.index') }}" wire:navigate class="btn-secondary text-xs">Open matches</a>
+                        <form method="POST" action="{{ route('companies.onepagers.store', $company) }}">
+                            @csrf
+                            <button type="submit" class="btn-primary text-xs">Start a blank one</button>
+                        </form>
+                    </div>
+                @endif
             </section>
         @else
             <section class="bg-white border border-slate-200 rounded-xl overflow-hidden divide-y divide-slate-100">
                 @foreach ($this->onePagers as $op)
                     @php
                         $match = $op->match;
-                        $headline = $match?->publicationItem?->title ?? $match?->pressRelease?->title ?? 'Untitled';
-                        $target = $match?->author?->name ?? $match?->publicationItem?->source?->name ?? 'Unknown target';
+                        $headline = $op->displayTitle();
+                        $target = $match
+                            ? ($match->author?->name ?? $match->publicationItem?->source?->name ?? 'Unknown target')
+                            : 'Standalone';
                     @endphp
 
                     <article wire:key="op-{{ $op->id }}"
@@ -98,16 +116,23 @@
                             @endif
                         </div>
 
+                    @php
+                        $editUrl = route('companies.onepagers.edit', ['company' => $company, 'onePager' => $op]);
+                    @endphp
                         {{-- Subject lines --}}
                         <div class="min-w-0 flex-1">
-                            <a href="{{ $match ? route('matches.one-pager', $match) : '#' }}" wire:navigate
+                            <a href="{{ $editUrl }}" wire:navigate
                                class="block group-hover:text-brand-700 transition-colors">
                                 <div class="text-sm font-medium text-slate-900 line-clamp-1">{{ $headline }}</div>
                                 <div class="text-xs text-slate-500 mt-0.5 line-clamp-1">
-                                    → {{ $target }}
-                                    @if ($match?->publicationItem?->source?->name && $match?->author?->name)
-                                        <span class="text-slate-400">·</span>
-                                        <span>{{ $match->publicationItem->source->name }}</span>
+                                    @if ($match)
+                                        → {{ $target }}
+                                        @if ($match?->publicationItem?->source?->name && $match?->author?->name)
+                                            <span class="text-slate-400">·</span>
+                                            <span>{{ $match->publicationItem->source->name }}</span>
+                                        @endif
+                                    @else
+                                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-medium uppercase tracking-wider">Standalone</span>
                                     @endif
                                 </div>
                             </a>
@@ -139,13 +164,11 @@
                                     <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                                 </a>
                             @endif
-                            @if ($match)
-                                <a href="{{ route('matches.one-pager', $match) }}" wire:navigate
-                                   class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium text-brand-700 hover:bg-brand-50 transition-colors">
-                                    Edit
-                                    <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6" /></svg>
-                                </a>
-                            @endif
+                            <a href="{{ $editUrl }}" wire:navigate
+                               class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium text-brand-700 hover:bg-brand-50 transition-colors">
+                                Edit
+                                <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6" /></svg>
+                            </a>
                         </div>
                     </article>
                 @endforeach
