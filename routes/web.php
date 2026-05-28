@@ -59,6 +59,7 @@ Route::middleware([
         Route::get('/companies/{company}/library', Livewire\Companies\MediaLibrary::class)->name('companies.library');
         Route::get('/companies/{company}/library/create', Livewire\Companies\MediaAssetEdit::class)->name('companies.library.create');
         Route::get('/companies/{company}/library/{asset}/edit', Livewire\Companies\MediaAssetEdit::class)->name('companies.library.edit');
+        Route::get('/companies/{company}/onepagers', Livewire\OnePagers\Index::class)->name('companies.onepagers');
         Route::get('/companies/{company}/branding', Livewire\Companies\Branding::class)->name('companies.branding');
 
         Route::get('/matches', Livewire\Matches\Index::class)->name('matches.index');

@@ -110,6 +110,8 @@
                            class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">Company page</a>
                         <a href="{{ route('companies.matches', $currentCompany) }}" wire:navigate
                            class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">Matches</a>
+                        <a href="{{ route('companies.onepagers', $currentCompany) }}" wire:navigate
+                           class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">One-pagers</a>
 
                         @if ($teamCompanies->count() > 1)
                             <div class="border-t border-slate-100 my-1"></div>
@@ -154,6 +156,7 @@
                 'trophy'   => 'M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0V4zM7 4H4v2a3 3 0 003 3M17 4h3v2a3 3 0 01-3 3',
                 'images'   => 'M4 7a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V7zM4 15l4-4 4 4 4-4 4 4M9 9a1 1 0 100-2 1 1 0 000 2z',
                 'palette'  => 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c1.1 0 2-.9 2-2 0-.51-.2-.97-.51-1.32-.3-.35-.49-.81-.49-1.31 0-1.1.9-2 2-2h2c2.76 0 5-2.24 5-5 0-4.96-4.48-9-10-9zM6.5 12a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm3-4a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm3 4a1.5 1.5 0 100-3 1.5 1.5 0 000 3z',
+                'onepager' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4',
             ];
         @endphp
 
@@ -170,13 +173,20 @@
                 </a>
             @endforeach
 
-            {{-- Company-scoped nav group: Library + Branding. Only shown when
-                 a company is in focus; routes are pre-bound to that company
-                 so a click never surprises you with the wrong context. --}}
+            {{-- Company-scoped nav group: One-pagers, Library, Branding. Only
+                 shown when a company is in focus; routes are pre-bound to that
+                 company so a click never surprises you with the wrong context. --}}
             @if ($currentCompany)
                 <div class="px-3 mb-2 mt-6 text-xs font-medium text-slate-400 uppercase tracking-wider">{{ \Illuminate\Support\Str::limit($currentCompany->name, 22) }}</div>
+                <a href="{{ route('companies.onepagers', $currentCompany) }}" wire:navigate
+                   class="nav-link {{ request()->routeIs('companies.onepagers') || request()->routeIs('matches.one-pager') ? 'nav-link-active' : '' }}">
+                    <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                        <path d="{{ $icons['onepager'] }}" />
+                    </svg>
+                    <span class="flex-1">One-pagers</span>
+                </a>
                 <a href="{{ route('companies.library', $currentCompany) }}" wire:navigate
-                   class="nav-link {{ request()->routeIs('companies.library') ? 'nav-link-active' : '' }}">
+                   class="nav-link {{ request()->routeIs('companies.library*') ? 'nav-link-active' : '' }}">
                     <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
                         <path d="{{ $icons['images'] }}" />
                     </svg>
