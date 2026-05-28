@@ -156,11 +156,11 @@ class SeedDemoData extends Command
             ->where('name', 'Aurelian Gold Resources Corp')
             ->delete();
 
-        // Publication items are global (sourced from team-visible sources, not
-        // owned by a company), so they don't cascade with the company delete.
-        // Wipe anything previously stamped by this seeder so re-runs don't
-        // accumulate duplicate Walker Lane hits, etc.
-        PublicationItem::where('external_guid', 'like', 'demo-%')->delete();
+        // Publication items intentionally stay put. They're global (anchored
+        // to team-visible sources) and shared across every demo seed, so
+        // deleting them would cascade-delete the matches of every OTHER
+        // demo user pointing at the same items. Idempotency on the items
+        // themselves is handled in makeItem() via firstOrCreate-by-URL.
     }
 
     private function ensureSourceCorpus(): void
@@ -549,20 +549,26 @@ SVG;
 
     private function makeItem(Source $source, Author $author, array $attrs): PublicationItem
     {
-        return PublicationItem::create([
-            'source_id' => $source->id,
-            'author_id' => $author->id,
-            'external_guid' => 'demo-'.Str::random(16),
-            'url' => $attrs['url'],
-            'title' => $attrs['title'],
-            'body_text' => $attrs['body_text'],
-            'published_at' => $attrs['published_at'],
-            'analysis_status' => PublicationItem::ANALYSIS_DONE,
-            'analyzed_at' => $attrs['published_at']->copy()->addMinutes(15),
-            'extracted_topics' => $attrs['extracted_topics'],
-            'extracted_entities' => $attrs['entities'],
-            'stance' => $attrs['stance'],
-        ]);
+        // firstOrCreate keyed on the (stable, demo-specific) URL so multiple
+        // demo seeds against the same install share the same publication
+        // items instead of stamping duplicates. The matches table fans out
+        // per-team, so sharing the source content is fine.
+        return PublicationItem::firstOrCreate(
+            ['url' => $attrs['url']],
+            [
+                'source_id' => $source->id,
+                'author_id' => $author->id,
+                'external_guid' => 'demo-'.Str::random(16),
+                'title' => $attrs['title'],
+                'body_text' => $attrs['body_text'],
+                'published_at' => $attrs['published_at'],
+                'analysis_status' => PublicationItem::ANALYSIS_DONE,
+                'analyzed_at' => $attrs['published_at']->copy()->addMinutes(15),
+                'extracted_topics' => $attrs['extracted_topics'],
+                'extracted_entities' => $attrs['entities'],
+                'stance' => $attrs['stance'],
+            ]
+        );
     }
 
     private function seedClaims(array $items, array $authors): void
