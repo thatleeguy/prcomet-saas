@@ -15,16 +15,40 @@ use Livewire\Component;
 class Dashboard extends Component
 {
     /**
+     * The currently scoped company — derived once per request and used by
+     * every computed below so the brief always reflects a single company.
+     */
+    #[Computed]
+    public function currentCompany(): ?Company
+    {
+        return auth()->user()->resolveCurrentCompany();
+    }
+
+    /**
+     * Build the base query scoped to the user's team and, when set, to
+     * the currently focused company. Centralising this means the stats,
+     * sparkline, and match lists can't drift apart.
+     */
+    protected function baseMatchQuery()
+    {
+        $team = auth()->user()->currentTeam;
+        $current = $this->currentCompany;
+
+        return MatchRecord::query()
+            ->when($current,
+                fn ($q) => $q->where('company_id', $current->id),
+                fn ($q) => $q->whereHas('company', fn ($c) => $c->where('team_id', $team->id))
+            );
+    }
+
+    /**
      * Top 3 unreviewed opportunities by score — the brief.
      */
     #[Computed]
     public function topMatches()
     {
-        $team = auth()->user()->currentTeam;
-
-        return MatchRecord::query()
+        return $this->baseMatchQuery()
             ->with(['company', 'publicationItem.source', 'author'])
-            ->whereHas('company', fn ($q) => $q->where('team_id', $team->id))
             ->where('status', MatchRecord::STATUS_NEW)
             ->orderByDesc('score')
             ->limit(3)
@@ -38,12 +62,10 @@ class Dashboard extends Component
     #[Computed]
     public function queueMatches()
     {
-        $team = auth()->user()->currentTeam;
         $topIds = $this->topMatches->pluck('id');
 
-        return MatchRecord::query()
+        return $this->baseMatchQuery()
             ->with(['company', 'publicationItem.source', 'author'])
-            ->whereHas('company', fn ($q) => $q->where('team_id', $team->id))
             ->whereNotIn('id', $topIds)
             ->whereNotIn('status', [MatchRecord::STATUS_DISMISSED])
             ->orderByDesc('created_at')
@@ -56,7 +78,7 @@ class Dashboard extends Component
     {
         $team = auth()->user()->currentTeam;
         $teamCompanyIds = Company::where('team_id', $team->id)->pluck('id');
-        $base = MatchRecord::whereIn('company_id', $teamCompanyIds);
+        $base = $this->baseMatchQuery();
 
         $newThisWeek = (clone $base)->where('status', MatchRecord::STATUS_NEW)
             ->where('created_at', '>=', now()->subDays(7))->count();
@@ -86,13 +108,10 @@ class Dashboard extends Component
     #[Computed]
     public function sparkline(): array
     {
-        $team = auth()->user()->currentTeam;
-        $teamCompanyIds = Company::where('team_id', $team->id)->pluck('id');
         $start = now()->subDays(13)->startOfDay();
 
-        $counts = MatchRecord::query()
+        $counts = $this->baseMatchQuery()
             ->selectRaw('DATE(created_at) as day, COUNT(*) as c')
-            ->whereIn('company_id', $teamCompanyIds)
             ->where('created_at', '>=', $start)
             ->groupBy('day')
             ->pluck('c', 'day');

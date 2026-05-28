@@ -73,14 +73,78 @@
             </div>
         @endif
 
+        {{-- Current company switcher.
+             Resolved here once and reused below to render the company-scoped
+             nav group. Shows even with a single company so the user always
+             knows which company the workspace is scoped to. --}}
+        @php
+            $currentCompany = auth()->user()->resolveCurrentCompany();
+            $teamCompanies = \App\Models\Company::where('team_id', Auth::user()->currentTeam->id)
+                ->orderBy('name')->get();
+        @endphp
+
+        @if ($currentCompany)
+            <div class="px-3 py-3 border-b border-slate-200">
+                <div class="px-3 mb-1.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">In focus</div>
+                <div x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false" class="relative">
+                    <button @click="open = !open" type="button"
+                            class="w-full flex items-center gap-2.5 px-3 py-2 rounded-md bg-brand-50/60 border border-brand-200 hover:border-brand-300 transition-colors text-left">
+                        <span class="grid place-items-center h-7 w-7 rounded-md bg-brand-600 text-white font-medium text-xs">
+                            {{ strtoupper(substr($currentCompany->name, 0, 2)) }}
+                        </span>
+                        <span class="flex-1 min-w-0">
+                            <span class="block text-sm font-medium text-slate-900 truncate">{{ $currentCompany->name }}</span>
+                            <span class="block text-xs text-brand-700/80">Company</span>
+                        </span>
+                        <svg class="h-4 w-4 text-slate-400 transition-transform" :class="open && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" /></svg>
+                    </button>
+
+                    <div x-show="open" x-cloak
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 -translate-y-1"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         class="absolute left-0 right-0 mt-2 rounded-lg bg-white shadow-lg ring-1 ring-slate-200 z-50 py-1.5"
+                         @click="open = false">
+                        <div class="px-3 py-1.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Shortcuts</div>
+                        <a href="{{ route('companies.show', $currentCompany) }}" wire:navigate
+                           class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">Company page</a>
+                        <a href="{{ route('companies.matches', $currentCompany) }}" wire:navigate
+                           class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">Matches</a>
+
+                        @if ($teamCompanies->count() > 1)
+                            <div class="border-t border-slate-100 my-1"></div>
+                            <div class="px-3 py-1.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Switch focus</div>
+                            @foreach ($teamCompanies as $c)
+                                @if ($c->id !== $currentCompany->id)
+                                    <form method="POST" action="{{ route('current-company.update') }}" class="block">
+                                        @csrf
+                                        @method('PUT')
+                                        <input type="hidden" name="company_id" value="{{ $c->id }}">
+                                        <button type="submit"
+                                                class="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 truncate">
+                                            {{ $c->name }}
+                                        </button>
+                                    </form>
+                                @endif
+                            @endforeach
+                        @endif
+
+                        <div class="border-t border-slate-100 my-1"></div>
+                        <a href="{{ route('companies.index') }}" wire:navigate
+                           class="block px-3 py-2 text-sm text-slate-500 hover:bg-slate-50">All companies →</a>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         {{-- Nav --}}
         @php
             $nav = [
-                ['route' => 'dashboard',        'label' => 'Overview',  'pattern' => 'dashboard',   'icon' => 'home'],
-                ['route' => 'companies.index',  'label' => 'Companies', 'pattern' => 'companies.*', 'icon' => 'building'],
-                ['route' => 'matches.index',    'label' => 'Matches',   'pattern' => 'matches.*',   'icon' => 'sparkles'],
-                ['route' => 'stream.index',     'label' => 'Stream',    'pattern' => 'stream.*',    'icon' => 'stream'],
-                ['route' => 'wins.index',       'label' => 'Wins',      'pattern' => 'wins.*',      'icon' => 'trophy'],
+                ['route' => 'dashboard',        'label' => 'Overview',  'pattern' => 'dashboard',         'icon' => 'home'],
+                ['route' => 'companies.index',  'label' => 'Companies', 'pattern' => 'companies.index',   'icon' => 'building'],
+                ['route' => 'matches.index',    'label' => 'Matches',   'pattern' => 'matches.*',         'icon' => 'sparkles'],
+                ['route' => 'stream.index',     'label' => 'Stream',    'pattern' => 'stream.*',          'icon' => 'stream'],
+                ['route' => 'wins.index',       'label' => 'Wins',      'pattern' => 'wins.*',            'icon' => 'trophy'],
             ];
             $icons = [
                 'home'     => 'M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3v-6h6v6h3a1 1 0 001-1V10',
@@ -88,6 +152,8 @@
                 'sparkles' => 'M5 3v4M3 5h4M6 17v4M4 19h4M13 3l3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7z',
                 'stream'   => 'M3 19a8 8 0 018-8M3 13a14 14 0 0114-14M5 19h.01',
                 'trophy'   => 'M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0V4zM7 4H4v2a3 3 0 003 3M17 4h3v2a3 3 0 01-3 3',
+                'images'   => 'M4 7a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V7zM4 15l4-4 4 4 4-4 4 4M9 9a1 1 0 100-2 1 1 0 000 2z',
+                'palette'  => 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c1.1 0 2-.9 2-2 0-.51-.2-.97-.51-1.32-.3-.35-.49-.81-.49-1.31 0-1.1.9-2 2-2h2c2.76 0 5-2.24 5-5 0-4.96-4.48-9-10-9zM6.5 12a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm3-4a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm3 4a1.5 1.5 0 100-3 1.5 1.5 0 000 3z',
             ];
         @endphp
 
@@ -103,6 +169,27 @@
                     <span class="flex-1">{{ $item['label'] }}</span>
                 </a>
             @endforeach
+
+            {{-- Company-scoped nav group: Library + Branding. Only shown when
+                 a company is in focus; routes are pre-bound to that company
+                 so a click never surprises you with the wrong context. --}}
+            @if ($currentCompany)
+                <div class="px-3 mb-2 mt-6 text-xs font-medium text-slate-400 uppercase tracking-wider">{{ \Illuminate\Support\Str::limit($currentCompany->name, 22) }}</div>
+                <a href="{{ route('companies.library', $currentCompany) }}" wire:navigate
+                   class="nav-link {{ request()->routeIs('companies.library') ? 'nav-link-active' : '' }}">
+                    <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                        <path d="{{ $icons['images'] }}" />
+                    </svg>
+                    <span class="flex-1">Media library</span>
+                </a>
+                <a href="{{ route('companies.branding', $currentCompany) }}" wire:navigate
+                   class="nav-link {{ request()->routeIs('companies.branding') ? 'nav-link-active' : '' }}">
+                    <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                        <path d="{{ $icons['palette'] }}" />
+                    </svg>
+                    <span class="flex-1">Branding</span>
+                </a>
+            @endif
 
             <div class="px-3 mb-2 mt-6 text-xs font-medium text-slate-400 uppercase tracking-wider">Account</div>
             <a href="{{ route('settings.digest') }}" wire:navigate class="nav-link {{ request()->routeIs('settings.*') ? 'nav-link-active' : '' }}">

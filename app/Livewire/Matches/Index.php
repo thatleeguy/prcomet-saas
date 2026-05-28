@@ -21,10 +21,25 @@ class Index extends Component
 
     public function mount(?Company $company = null): void
     {
+        $user = auth()->user();
+
         if ($company && $company->exists) {
-            abort_unless($company->team_id === auth()->user()->currentTeam?->id, 403);
+            abort_unless($company->team_id === $user->currentTeam?->id, 403);
             $this->company = $company;
+
+            // Visiting /companies/{c}/matches pins focus — mirrors the
+            // implicit switch on Show/Library/Branding so the chip stays
+            // in sync with what you're looking at.
+            if ($user->current_company_id !== $company->id) {
+                $user->switchCompany($company);
+            }
+
+            return;
         }
+
+        // No explicit company in the URL — fall back to the user's pinned
+        // focus so /dashboard/matches always shows one company's matches.
+        $this->company = $user->resolveCurrentCompany();
     }
 
     #[Computed]

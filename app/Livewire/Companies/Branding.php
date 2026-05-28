@@ -53,6 +53,11 @@ class Branding extends Component
         abort_unless($company->team_id === auth()->user()->currentTeam?->id, 403);
         $this->company = $company;
 
+        // Implicit focus-switch — see MediaLibrary::mount() for rationale.
+        if (auth()->user()->current_company_id !== $company->id) {
+            auth()->user()->switchCompany($company);
+        }
+
         $this->accentColor = $company->accent_color ?? '';
         $this->tagline = $company->tagline ?? '';
         $this->description = $company->description_md ?? '';

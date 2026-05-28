@@ -18,6 +18,11 @@ class Show extends Component
     {
         abort_unless($company->team_id === auth()->user()->currentTeam?->id, 403);
         $this->company = $company;
+
+        // Implicit focus-switch — see MediaLibrary::mount() for rationale.
+        if (auth()->user()->current_company_id !== $company->id) {
+            auth()->user()->switchCompany($company);
+        }
     }
 
     /**

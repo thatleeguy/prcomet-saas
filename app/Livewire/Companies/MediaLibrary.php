@@ -67,6 +67,13 @@ class MediaLibrary extends Component
     {
         abort_unless($company->team_id === auth()->user()->currentTeam?->id, 403);
         $this->company = $company;
+
+        // Navigating directly to a company-scoped page implicitly switches
+        // focus — keeps the nav chip and global lists honest about which
+        // company you're actually working in.
+        if (auth()->user()->current_company_id !== $company->id) {
+            auth()->user()->switchCompany($company);
+        }
     }
 
     #[Computed]

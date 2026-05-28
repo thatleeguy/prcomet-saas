@@ -46,6 +46,11 @@ Route::middleware([
     Route::middleware('team.active')->group(function () {
         Route::get('/', Livewire\Dashboard::class)->name('dashboard');
 
+        // Pin a company as the user's "current focus" — drives the
+        // workspace scoping (matches list, dashboard widget, nav items).
+        Route::put('/current-company', [\App\Http\Controllers\CurrentCompanyController::class, 'update'])
+            ->name('current-company.update');
+
         Route::get('/companies', Livewire\Companies\Index::class)->name('companies.index');
         Route::get('/companies/create', Livewire\Companies\Edit::class)->name('companies.create');
         Route::get('/companies/{company}', Livewire\Companies\Show::class)->name('companies.show');
