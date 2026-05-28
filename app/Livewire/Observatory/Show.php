@@ -35,13 +35,28 @@ class Show extends Component
     public Watch $watch;
 
     #[Url(as: 'status', except: 'all')]
-    public string $statusFilter = 'all'; // all|confirmed|rejected|pending
+    public string $statusFilter = 'all'; // all|unread|confirmed|rejected|pending
 
     #[Url(as: 'q')]
     public string $search = '';
 
     public function updatingSearch(): void { $this->resetPage(); }
     public function updatingStatusFilter(): void { $this->resetPage(); }
+
+    public function markRead(int $hitId): void
+    {
+        $hit = WatchHit::where('watch_id', $this->watch->id)->findOrFail($hitId);
+        $hit->markSeen();
+    }
+
+    public function markAllRead(): void
+    {
+        WatchHit::where('watch_id', $this->watch->id)
+            ->whereNull('seen_at')
+            ->update(['seen_at' => now()]);
+
+        session()->flash('status', 'Marked all hits as read.');
+    }
 
     public function mount(Company $company, Watch $watch): void
     {
@@ -90,6 +105,7 @@ class Show extends Component
 
         return [
             'total' => (clone $base)->count(),
+            'unread' => (clone $base)->whereNull('seen_at')->count(),
             'confirmed' => (clone $base)->where('confirmed_by_llm', true)->count(),
             'rejected' => (clone $base)->where('confirmed_by_llm', false)->count(),
             'pending' => (clone $base)->whereNull('confirmed_by_llm')->count(),
@@ -100,6 +116,7 @@ class Show extends Component
     {
         $hits = WatchHit::query()
             ->where('watch_id', $this->watch->id)
+            ->when($this->statusFilter === 'unread', fn ($q) => $q->whereNull('seen_at'))
             ->when($this->statusFilter === 'confirmed', fn ($q) => $q->where('confirmed_by_llm', true))
             ->when($this->statusFilter === 'rejected', fn ($q) => $q->where('confirmed_by_llm', false))
             ->when($this->statusFilter === 'pending', fn ($q) => $q->whereNull('confirmed_by_llm'))

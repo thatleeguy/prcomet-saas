@@ -21,14 +21,13 @@
 
     @php
         $counts = $this->counts;
-        $statuses = $this->llmEnabled
-            ? [
-                'all' => ['label' => 'All', 'count' => $counts['total']],
-                'confirmed' => ['label' => 'Confirmed', 'count' => $counts['confirmed']],
-                'pending' => ['label' => 'Pending', 'count' => $counts['pending']],
-                'rejected' => ['label' => 'Rejected', 'count' => $counts['rejected']],
-            ]
-            : ['all' => ['label' => 'All', 'count' => $counts['total']]];
+        $statuses = ['all' => ['label' => 'All', 'count' => $counts['total']],
+                     'unread' => ['label' => 'Unread', 'count' => $counts['unread']]];
+        if ($this->llmEnabled) {
+            $statuses['confirmed'] = ['label' => 'Confirmed', 'count' => $counts['confirmed']];
+            $statuses['pending']   = ['label' => 'Pending',   'count' => $counts['pending']];
+            $statuses['rejected']  = ['label' => 'Rejected',  'count' => $counts['rejected']];
+        }
     @endphp
 
     <div class="space-y-6 animate-fade-in">
@@ -96,6 +95,10 @@
                 <input type="search" wire:model.live.debounce.300ms="search" placeholder="Search snippets…"
                        class="w-full pl-9 pr-3 py-1.5 text-sm rounded-md border-slate-200 focus:border-brand-500 focus:ring-brand-500 bg-white" />
             </div>
+
+            @if ($counts['unread'] > 0)
+                <button wire:click="markAllRead" class="btn-secondary text-xs whitespace-nowrap">Mark all read</button>
+            @endif
         </section>
 
         {{-- Hits --}}
@@ -116,44 +119,62 @@
                     @php
                         $snippet = $hit->context_snippet ?? '';
                         $term = $hit->matched_term;
+                        $unread = $hit->seen_at === null;
                     @endphp
-                    <article wire:key="hit-{{ $hit->id }}" class="px-5 py-4 hover:bg-slate-50/60 transition-colors">
-                        <div class="flex items-start justify-between gap-3 mb-2">
-                            <div class="flex items-center gap-1.5 text-[11px]">
-                                @if ($hit->confirmed_by_llm === true)
-                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 font-medium">
-                                        <svg class="h-2.5 w-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                                        Confirmed
-                                    </span>
-                                @elseif ($hit->confirmed_by_llm === false)
-                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 font-medium">
-                                        Rejected
-                                    </span>
-                                @elseif ($this->llmEnabled)
-                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Pending</span>
+                    <article wire:key="hit-{{ $hit->id }}"
+                             class="relative pl-5 pr-4 py-3.5 hover:bg-slate-50/60 transition-colors
+                                    {{ $unread ? 'bg-white' : 'bg-slate-50/30' }}">
+                        @if ($unread)
+                            <span class="absolute left-0 inset-y-0 w-1 bg-brand-500"></span>
+                        @endif
+
+                        <div class="flex items-start gap-3">
+                            <button wire:click="markRead({{ $hit->id }})"
+                                    class="mt-1.5 shrink-0 grid place-items-center h-4 w-4 rounded-full transition-colors {{ $unread ? 'bg-brand-500 hover:bg-brand-600' : 'bg-slate-200' }}"
+                                    title="{{ $unread ? 'Mark as read' : 'Read' }}">
+                                @if (! $unread)
+                                    <svg class="h-2.5 w-2.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
                                 @endif
-                                <span class="inline-flex items-center px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-medium uppercase tracking-wider text-[10px]">{{ $hit->contentTypeLabel() }}</span>
-                                <span class="text-slate-400">·</span>
-                                <span class="text-slate-500">{{ $hit->matched_at->diffForHumans() }}</span>
-                                <span class="text-slate-400">·</span>
-                                <span class="text-slate-500">matched <span class="font-mono text-slate-700">{{ $term }}</span></span>
+                            </button>
+
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center gap-1.5 text-[11px] mb-1">
+                                    @if ($hit->confirmed_by_llm === true)
+                                        <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 font-medium">
+                                            <svg class="h-2.5 w-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                                            Confirmed
+                                        </span>
+                                    @elseif ($hit->confirmed_by_llm === false)
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 font-medium">Rejected</span>
+                                    @elseif ($this->llmEnabled)
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Pending</span>
+                                    @endif
+                                    <span class="text-slate-500">matched <span class="font-mono text-slate-700">{{ $term }}</span></span>
+                                    <span class="text-slate-400 ml-auto whitespace-nowrap">{{ $hit->matched_at->diffForHumans() }}</span>
+                                </div>
+
+                                <div class="text-sm {{ $unread ? 'text-slate-900 font-semibold' : 'text-slate-700' }} line-clamp-1 mb-0.5">{{ $hit->contentTitle() }}</div>
+
+                                @if ($snippet !== '')
+                                    <p class="text-xs text-slate-600 leading-relaxed line-clamp-2">
+                                        {!! preg_replace('/('.preg_quote($term, '/').')/i', '<mark class="bg-amber-100 text-slate-900 px-0.5 rounded">$1</mark>', e($snippet)) !!}
+                                    </p>
+                                @endif
+
+                                @if ($hit->llm_reasoning)
+                                    <p class="text-[11px] text-slate-500 mt-1 italic">Claude: {{ $hit->llm_reasoning }}</p>
+                                @endif
                             </div>
+
                             @if ($url = $hit->contentUrl())
-                                <a href="{{ $url }}" target="_blank" rel="noopener" class="text-xs text-brand-700 hover:underline shrink-0">Open ↗</a>
+                                <a href="{{ $url }}" target="_blank" rel="noopener"
+                                   wire:click="markRead({{ $hit->id }})"
+                                   class="shrink-0 inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs text-slate-600 hover:bg-white hover:text-slate-900 border border-transparent hover:border-slate-200 transition-colors">
+                                    Open
+                                    <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                </a>
                             @endif
                         </div>
-
-                        <div class="text-sm text-slate-900 font-medium line-clamp-1 mb-1">{{ $hit->contentTitle() }}</div>
-
-                        @if ($snippet !== '')
-                            <p class="text-sm text-slate-700 leading-relaxed">
-                                {!! preg_replace('/('.preg_quote($term, '/').')/i', '<mark class="bg-amber-100 text-slate-900 px-0.5 rounded">$1</mark>', e($snippet)) !!}
-                            </p>
-                        @endif
-
-                        @if ($hit->llm_reasoning)
-                            <p class="text-xs text-slate-500 mt-2 italic">Claude: {{ $hit->llm_reasoning }}</p>
-                        @endif
                     </article>
                 @endforeach
             </section>

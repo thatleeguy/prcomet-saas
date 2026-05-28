@@ -33,14 +33,33 @@ class WatchHit extends Model
         'confirmed_by_llm',
         'llm_reasoning',
         'matched_at',
+        'seen_at',
     ];
 
     protected function casts(): array
     {
         return [
             'matched_at' => 'datetime',
+            'seen_at' => 'datetime',
             'confirmed_by_llm' => 'boolean',
         ];
+    }
+
+    public function isSeen(): bool
+    {
+        return $this->seen_at !== null;
+    }
+
+    public function scopeUnread($query)
+    {
+        return $query->whereNull('seen_at');
+    }
+
+    public function markSeen(): void
+    {
+        if ($this->seen_at === null) {
+            $this->forceFill(['seen_at' => now()])->save();
+        }
     }
 
     public function watch(): BelongsTo

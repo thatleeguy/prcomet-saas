@@ -18,6 +18,11 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Idempotent — same Forge half-batch concern as the watches tables.
+        if (Schema::hasColumn('teams', 'llm_observatory_enabled')) {
+            return;
+        }
+
         Schema::table('teams', function (Blueprint $table) {
             $table->boolean('llm_observatory_enabled')->default(false);
         });

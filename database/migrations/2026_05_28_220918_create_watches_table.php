@@ -24,6 +24,11 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Idempotent — see watch_hits migration note.
+        if (Schema::hasTable('watches')) {
+            return;
+        }
+
         Schema::create('watches', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained()->cascadeOnDelete();

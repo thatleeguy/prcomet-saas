@@ -24,6 +24,14 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Idempotent: a previous deploy may have created the table but failed
+        // before recording the migration row (Forge's batch can drop a step
+        // mid-flight). Re-running should pick up the missing migration row
+        // without trying to recreate an existing table.
+        if (Schema::hasTable('watch_hits')) {
+            return;
+        }
+
         Schema::create('watch_hits', function (Blueprint $table) {
             $table->id();
             $table->foreignId('watch_id')->constrained()->cascadeOnDelete();

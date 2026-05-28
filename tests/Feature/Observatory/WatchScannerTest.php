@@ -146,6 +146,50 @@ it('downgrades literal_llm to literal when the team is not entitled', function (
     expect($watch->llmEnabled())->toBeTrue();
 });
 
+it('marks a hit as seen when the user clicks the dot', function () {
+    PublicationItem::factory()->create([
+        'source_id' => $this->source->id,
+        'title' => 'Newmont news',
+        'body_text' => 'Body.',
+    ]);
+
+    $watch = Watch::create([
+        'company_id' => $this->company->id,
+        'name' => 'Newmont',
+        'kind' => Watch::KIND_COMPANY,
+        'terms' => ['Newmont'],
+        'mode' => Watch::MODE_LITERAL,
+    ]);
+
+    app(WatchScanner::class)->scan($watch);
+    $hit = WatchHit::firstWhere('watch_id', $watch->id);
+
+    expect($hit->isSeen())->toBeFalse();
+    $hit->markSeen();
+    expect($hit->fresh()->isSeen())->toBeTrue();
+    expect($hit->fresh()->seen_at)->not->toBeNull();
+});
+
+it('markAllRead on the index respects the watch + status filters', function () {
+    $watchA = Watch::create(['company_id' => $this->company->id, 'name' => 'A', 'kind' => 'company', 'terms' => ['A'], 'mode' => 'literal']);
+    $watchB = Watch::create(['company_id' => $this->company->id, 'name' => 'B', 'kind' => 'company', 'terms' => ['B'], 'mode' => 'literal']);
+
+    PublicationItem::factory()->create(['source_id' => $this->source->id, 'title' => 'A news', 'body_text' => 'A here.']);
+    PublicationItem::factory()->create(['source_id' => $this->source->id, 'title' => 'B news', 'body_text' => 'B here.']);
+
+    app(WatchScanner::class)->scan($watchA);
+    app(WatchScanner::class)->scan($watchB);
+
+    \Livewire\Livewire::actingAs($this->user)
+        ->test(\App\Livewire\Observatory\Index::class, ['company' => $this->company])
+        ->call('setWatch', $watchA->id)
+        ->call('markAllRead');
+
+    expect(WatchHit::where('watch_id', $watchA->id)->whereNull('seen_at')->count())->toBe(0);
+    // Watch B was not in scope — its hit stays unread.
+    expect(WatchHit::where('watch_id', $watchB->id)->whereNull('seen_at')->count())->toBe(1);
+});
+
 it('bumps hit_count and last_matched_at on the watch when scan finds new hits', function () {
     PublicationItem::factory()->create([
         'source_id' => $this->source->id,
