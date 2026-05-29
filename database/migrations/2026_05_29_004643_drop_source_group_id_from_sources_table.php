@@ -2,26 +2,31 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 /**
  * Retires the old belongsTo column. By this migration the pivot
  * (source_group_source) is the single source of truth for
- * source ↔ group membership. Running this without first having run
- * the backfill in the previous migration would lose data, so we
- * guard with hasColumn() and skip cleanly if it's already gone.
+ * source ↔ group membership. The backfill in the previous migration
+ * runs first, so dropping the column here loses no data.
  *
- * Driver quirks handled:
- *   - SQLite refuses to drop a column that still has an index on it,
- *     so the explicit index must come off first.
- *   - On MySQL, foreignId()->constrained() creates an implicit
- *     FK-backed index that may share or differ from the explicit
- *     one we added in the previous migration. Either is fine, but
- *     the explicit named drop can blow up if MySQL never created
- *     a separate index under that name. The drop is wrapped in a
- *     soft-fail so a missing index is a no-op, not a deploy
- *     failure.
+ * Why this is so defensive:
+ *
+ *   - SQLite refuses to drop a column with an index still on it, so
+ *     the explicit named index must come off first.
+ *   - On MySQL, foreignId()->constrained() creates an FK constraint
+ *     PLUS an implicit index. The explicit index we also added in
+ *     the previous migration may or may not have been collapsed
+ *     into the implicit one depending on driver version.
+ *   - When this migration aborts halfway (as it did on the last two
+ *     Forge deploys), the next deploy retries from a state where
+ *     some of {named index, implicit index, FK} are already gone.
+ *
+ * Each of the three drops (named index, FK constraint, column) is
+ * therefore independent and try/catch-wrapped: missing-target errors
+ * become no-ops instead of deploy failures. The terminal dropColumn
+ * is the only step that MUST succeed — guarded by the hasColumn()
+ * check at the top.
  */
 return new class extends Migration
 {
@@ -31,21 +36,37 @@ return new class extends Migration
             return;
         }
 
-        // Try the explicit index drop first. If MySQL never created a
-        // named index by that name (the FK provided its own implicit
-        // one), swallow the resulting "Can't DROP" error and move on.
+        // Drop the explicit named index if it exists. SQLite needs
+        // this gone before the column drop; MySQL is fine either way.
         try {
             Schema::table('sources', function (Blueprint $table) {
                 $table->dropIndex('sources_source_group_id_index');
             });
         } catch (\Throwable $e) {
-            // Index either doesn't exist under that name or was
-            // already dropped by the FK removal in an earlier
-            // partial-deploy. Either way, nothing more to do here.
+            // Index either doesn't exist under that name (MySQL may
+            // have collapsed it into the FK-implicit one) or was
+            // dropped by an earlier partial deploy. Either way,
+            // nothing more to do here.
         }
 
+        // Drop the FK constraint if it exists. SQLite doesn't enforce
+        // FKs at the schema level so this is a no-op there; MySQL
+        // raises 1091 ("Can't DROP") when the named constraint is
+        // already gone.
+        try {
+            Schema::table('sources', function (Blueprint $table) {
+                $table->dropForeign(['source_group_id']);
+            });
+        } catch (\Throwable $e) {
+            // FK already removed by an earlier partial deploy or never
+            // present on this driver. Continue to the column drop.
+        }
+
+        // Finally drop the column itself. If we got here, hasColumn
+        // returned true at the top, so this is the one step that
+        // must succeed — let any error bubble up.
         Schema::table('sources', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('source_group_id');
+            $table->dropColumn('source_group_id');
         });
     }
 
