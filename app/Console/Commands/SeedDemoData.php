@@ -996,41 +996,76 @@ SVG;
     }
 
     /**
-     * Seed a handful of newsroom subscribers so the customer's
-     * Branding panel shows meaningful follower numbers on first
-     * login, and so the manage-subscriptions page has a believable
-     * preview when the operator clicks through.
+     * Populate a richer slice of the PrComet network for the demo.
      *
-     * Uses the shared identity model: a few of these subscribers
-     * follow multiple companies across the install so the network
-     * effect is visible in the demo.
+     * Three layers:
+     *   - Core followers (~15) — journalists, IR analysts, retail
+     *     watchers — attached to every demo company so the network
+     *     effect is visible from any account.
+     *   - Company-bound followers (~5) — names that look like they
+     *     came from this specific company's outreach, attached
+     *     only here.
+     *   - Pending confirms (~2) — surface the "needs to click"
+     *     state on the Audience page filter.
+     *
+     * Cadence mix roughly mirrors what we'd expect post-launch
+     * (~55% weekly, ~30% daily, ~15% instant). Subscribed-at
+     * dates scattered across the last 90 days so the "This month"
+     * stat reads as believable rather than synthetic.
      */
     private function seedNewsroomSubscribers(Company $company): void
     {
-        $samples = [
-            ['email' => 'rob.sinclair@example.com',  'name' => 'Rob Sinclair',  'cadence' => 'weekly',  'confirmed' => true],
-            ['email' => 'maria.cardoso@example.com', 'name' => 'Maria Cardoso', 'cadence' => 'daily',   'confirmed' => true],
-            ['email' => 'wei.tan@example.com',       'name' => 'Wei Tan',       'cadence' => 'weekly',  'confirmed' => true],
-            ['email' => 'jess.morrow@example.com',   'name' => 'Jess Morrow',   'cadence' => 'instant', 'confirmed' => true],
-            ['email' => 'leah.kerner@example.com',   'name' => 'Leah Kerner',   'cadence' => 'weekly',  'confirmed' => false],
-            ['email' => 'sam.byrne@example.com',     'name' => 'Sam Byrne',     'cadence' => 'weekly',  'confirmed' => true],
+        // Core network — same emails attach to every demo company.
+        // firstOrCreate dedupes by email_hashed, so running the seed
+        // for multiple companies builds the cross-company network.
+        $core = [
+            ['email' => 'rob.sinclair@example.com',    'name' => 'Rob Sinclair',     'cadence' => 'weekly',  'confirmed' => true,  'days_ago' => 47],
+            ['email' => 'maria.cardoso@example.com',   'name' => 'Maria Cardoso',    'cadence' => 'daily',   'confirmed' => true,  'days_ago' => 22],
+            ['email' => 'wei.tan@example.com',         'name' => 'Wei Tan',          'cadence' => 'weekly',  'confirmed' => true,  'days_ago' => 64],
+            ['email' => 'jess.morrow@example.com',     'name' => 'Jess Morrow',      'cadence' => 'instant', 'confirmed' => true,  'days_ago' => 12],
+            ['email' => 'leah.kerner@example.com',     'name' => 'Leah Kerner',      'cadence' => 'weekly',  'confirmed' => false, 'days_ago' => 1],
+            ['email' => 'sam.byrne@example.com',       'name' => 'Sam Byrne',        'cadence' => 'weekly',  'confirmed' => true,  'days_ago' => 38],
+            ['email' => 'arjun.mehta@example.com',     'name' => 'Arjun Mehta',      'cadence' => 'weekly',  'confirmed' => true,  'days_ago' => 84],
+            ['email' => 'helena.bauer@example.com',    'name' => 'Helena Bauer',     'cadence' => 'daily',   'confirmed' => true,  'days_ago' => 16],
+            ['email' => 'mike.donlon@example.com',     'name' => 'Mike Donlon',      'cadence' => 'weekly',  'confirmed' => true,  'days_ago' => 5],
+            ['email' => 'priya.reddy@example.com',     'name' => 'Priya Reddy',      'cadence' => 'weekly',  'confirmed' => true,  'days_ago' => 71],
+            ['email' => 'tom.iwasaki@example.com',     'name' => 'Tom Iwasaki',      'cadence' => 'instant', 'confirmed' => true,  'days_ago' => 28],
+            ['email' => 'nora.everleigh@example.com',  'name' => 'Nora Everleigh',   'cadence' => 'weekly',  'confirmed' => true,  'days_ago' => 51],
+            ['email' => 'devon.akpoma@example.com',    'name' => 'Devon Akpoma',     'cadence' => 'daily',   'confirmed' => true,  'days_ago' => 9],
+            ['email' => 'ines.coelho@example.com',     'name' => 'Inés Coelho',      'cadence' => 'weekly',  'confirmed' => true,  'days_ago' => 33],
+            ['email' => 'kim.haraldson@example.com',   'name' => 'Kim Haraldson',    'cadence' => 'weekly',  'confirmed' => true,  'days_ago' => 19],
         ];
 
-        foreach ($samples as $spec) {
+        // Company-bound followers — only attach to this company.
+        // Hash the company id into the local-part so identities
+        // stay distinct per demo company.
+        $companyKey = substr(md5((string) $company->id), 0, 6);
+        $bound = [
+            ['email' => "investor.relations.{$companyKey}@example.com", 'name' => 'IR Inquiry',        'cadence' => 'weekly',  'confirmed' => true,  'days_ago' => 2],
+            ['email' => "research.{$companyKey}@example.com",           'name' => 'Buyside Research',  'cadence' => 'daily',   'confirmed' => true,  'days_ago' => 4],
+            ['email' => "newsroom.{$companyKey}@example.com",           'name' => 'Newsroom Watch',    'cadence' => 'instant', 'confirmed' => true,  'days_ago' => 11],
+            ['email' => "boardroom.{$companyKey}@example.com",          'name' => 'Boardroom Updates', 'cadence' => 'weekly',  'confirmed' => true,  'days_ago' => 6],
+            ['email' => "retail.{$companyKey}@example.com",             'name' => 'Retail Follower',   'cadence' => 'weekly',  'confirmed' => false, 'days_ago' => 0],
+        ];
+
+        foreach ([...$core, ...$bound] as $spec) {
             $subscriber = \App\Models\NewsroomSubscriber::firstOrCreate(
                 ['email_hashed' => \App\Models\NewsroomSubscriber::hashEmail($spec['email'])],
                 [
                     'email' => $spec['email'],
                     'name' => $spec['name'],
                     'cadence' => $spec['cadence'],
-                    'confirmed_at' => $spec['confirmed'] ? now()->subDays(3) : null,
+                    'confirmed_at' => $spec['confirmed'] ? now()->subDays(max(1, $spec['days_ago'])) : null,
                     'source_ref' => 'demo-seed',
+                    'last_digest_sent_at' => $spec['confirmed'] && $spec['cadence'] !== 'instant'
+                        ? now()->subDays($spec['cadence'] === 'daily' ? 1 : 7)
+                        : null,
                 ],
             );
 
             \App\Models\NewsroomSubscription::firstOrCreate(
                 ['newsroom_subscriber_id' => $subscriber->id, 'company_id' => $company->id],
-                ['subscribed_at' => now()->subDays(rand(1, 30))],
+                ['subscribed_at' => now()->subDays(max(0, $spec['days_ago']))],
             );
         }
     }

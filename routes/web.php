@@ -90,6 +90,7 @@ Route::middleware([
         Route::get('/companies/{company}/observatory/{watch}', Livewire\Observatory\Show::class)->name('companies.observatory.show');
         Route::get('/companies/{company}/observatory/{watch}/edit', Livewire\Observatory\Edit::class)->name('companies.observatory.edit');
         Route::get('/companies/{company}/branding', Livewire\Companies\Branding::class)->name('companies.branding');
+        Route::get('/companies/{company}/audience', Livewire\Companies\Audience::class)->name('companies.audience');
 
         Route::get('/matches', Livewire\Matches\Index::class)->name('matches.index');
         Route::get('/matches/{match}', Livewire\Matches\Show::class)->name('matches.show');

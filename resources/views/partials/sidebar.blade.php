@@ -207,6 +207,13 @@
                     </svg>
                     <span class="flex-1">Branding</span>
                 </a>
+                <a href="{{ route('companies.audience', $currentCompany) }}" wire:navigate
+                   class="nav-link {{ request()->routeIs('companies.audience') ? 'nav-link-active' : '' }}">
+                    <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                        <path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6 5.87v-2a4 4 0 00-3-3.87m6 5.87a4 4 0 00-3-3.87m0 0V8a3 3 0 116 0v6M9 12a3 3 0 116 0M9 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span class="flex-1">Audience</span>
+                </a>
             @endif
 
             <div class="px-3 mb-2 mt-6 text-xs font-medium text-slate-400 uppercase tracking-wider">Account</div>
