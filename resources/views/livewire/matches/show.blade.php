@@ -234,6 +234,102 @@
                 </section>
 
                 {{-- Citations --}}
+                {{-- ── AI pitch draft ──────────────────────────────────────
+                     Generates a cold-outreach email tailored to this
+                     journalist + release. Closes the loop on the brief
+                     — discover → suggest → DRAFT → send. --}}
+                <section class="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-indigo-50/30 p-6 lg:p-8 space-y-5">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <div class="inline-flex items-center gap-1.5 mb-1.5">
+                                <svg class="h-3.5 w-3.5 text-indigo-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                                <span class="text-[10px] font-semibold text-indigo-600 uppercase tracking-wider">AI</span>
+                            </div>
+                            <h3 class="text-base font-semibold text-slate-900">Pitch draft</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">A starting point — tailored to {{ $match->author?->name ?? 'this journalist' }}'s voice using their corpus and the suggested angle above.</p>
+                        </div>
+                    </div>
+
+                    @if (! $this->aiEnabled)
+                        <div class="rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50 via-violet-50 to-fuchsia-50 p-4 flex items-start gap-3">
+                            <div class="grid place-items-center h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 text-white shrink-0">
+                                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                            </div>
+                            <div class="flex-1">
+                                <div class="text-sm font-semibold text-slate-900">Upgrade to draft this for you</div>
+                                <p class="text-xs text-slate-600 leading-relaxed mt-0.5">Claude reads {{ $match->author?->name ?? 'the journalist' }}'s recent work and drafts a 4-paragraph cold pitch in their voice. Editable, copy-able, mailto-ready.</p>
+                            </div>
+                            <a href="mailto:hello@prcomet.com?subject=AI%20pitch%20drafts%20upgrade" class="btn-secondary text-xs whitespace-nowrap">Contact us →</a>
+                        </div>
+                    @else
+                        {{-- Tone selector --}}
+                        <div class="flex items-center gap-1 p-1 bg-white rounded-lg border border-slate-200 w-fit">
+                            @foreach (\App\Models\PitchDraft::TONES as $key => $label)
+                                <button wire:click="setPitchTone('{{ $key }}')"
+                                        class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors
+                                               {{ $pitchTone === $key ? 'bg-brand-50 text-brand-700' : 'text-slate-600 hover:bg-slate-50' }}">
+                                    {{ $label }}
+                                </button>
+                            @endforeach
+                        </div>
+
+                        @if ($draft = $this->currentDraft)
+                            {{-- Existing draft for this tone --}}
+                            <div class="space-y-3">
+                                <div class="rounded-xl border border-slate-200 bg-white overflow-hidden">
+                                    <div class="px-4 py-3 border-b border-slate-100 bg-slate-50">
+                                        <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Subject</div>
+                                        <div class="text-sm font-medium text-slate-900">{{ $draft->subject }}</div>
+                                    </div>
+                                    <div class="px-4 py-4">
+                                        <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Body</div>
+                                        <pre class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap font-sans">{{ $draft->body }}</pre>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-wrap items-center gap-2"
+                                     x-data="{
+                                        copied: false,
+                                        copy(text) {
+                                            navigator.clipboard.writeText(text).then(() => {
+                                                this.copied = true;
+                                                setTimeout(() => this.copied = false, 1500);
+                                            });
+                                        }
+                                     }">
+                                    <a href="{{ $draft->mailtoUrl($this->recipientEmail) }}"
+                                       class="btn-primary inline-flex items-center gap-1.5 text-xs">
+                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                        Open in mail client
+                                    </a>
+                                    <button @click='copy(@js($draft->subject."\n\n".$draft->body))'
+                                            class="btn-secondary inline-flex items-center gap-1.5 text-xs">
+                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                                        <span x-text="copied ? 'Copied!' : 'Copy'"></span>
+                                    </button>
+                                    <button wire:click="generatePitchDraft" wire:loading.attr="disabled"
+                                            class="btn-secondary inline-flex items-center gap-1.5 text-xs">
+                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" wire:loading.remove wire:target="generatePitchDraft"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                                        <span wire:loading.remove wire:target="generatePitchDraft">Regenerate</span>
+                                        <span wire:loading wire:target="generatePitchDraft">Drafting…</span>
+                                    </button>
+                                    <span class="text-[11px] text-slate-400 ml-auto">Drafted {{ $draft->updated_at->diffForHumans() }}</span>
+                                </div>
+                            </div>
+                        @else
+                            {{-- No draft yet for this tone --}}
+                            <div class="rounded-xl border-2 border-dashed border-slate-200 bg-white p-6 text-center">
+                                <p class="text-sm text-slate-600 mb-3">Generate a {{ strtolower(\App\Models\PitchDraft::TONES[$pitchTone]) }} pitch in {{ $match->author?->name ?? 'the journalist' }}'s register.</p>
+                                <button wire:click="generatePitchDraft" wire:loading.attr="disabled" class="btn-primary inline-flex items-center gap-1.5 text-xs">
+                                    <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24" wire:loading.remove wire:target="generatePitchDraft"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                                    <span wire:loading.remove wire:target="generatePitchDraft">Draft this for me</span>
+                                    <span wire:loading wire:target="generatePitchDraft">Claude is drafting…</span>
+                                </button>
+                            </div>
+                        @endif
+                    @endif
+                </section>
+
                 @if (! empty($match->citations))
                     <section class="rounded-2xl border border-slate-200 bg-white p-6">
                         <h3 class="text-sm font-semibold text-slate-900 mb-4">Citations</h3>

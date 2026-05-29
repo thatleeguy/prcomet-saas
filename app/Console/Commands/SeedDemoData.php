@@ -195,6 +195,9 @@ class SeedDemoData extends Command
                 'twitter' => 'https://x.com/aureliangold',
                 'linkedin' => 'https://linkedin.com/company/aurelian-gold',
             ],
+            // Public newsroom on by default for the demo so the URL
+            // is live as soon as the operator opens the page.
+            'newsroom_published' => true,
         ]);
     }
 

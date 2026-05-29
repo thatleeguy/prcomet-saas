@@ -55,6 +55,9 @@ class Branding extends Component
     #[Validate('nullable|file|mimes:pdf|max:5120')]
     public $blanketReleaseFile;
 
+    // Public newsroom toggle.
+    public bool $newsroomPublished = false;
+
     public function mount(Company $company): void
     {
         abort_unless($company->team_id === auth()->user()->currentTeam?->id, 403);
@@ -72,6 +75,7 @@ class Branding extends Component
         $this->twitter = $company->social_links['twitter'] ?? '';
         $this->linkedin = $company->social_links['linkedin'] ?? '';
         $this->blanketReleaseText = $company->blanket_media_release_text ?? '';
+        $this->newsroomPublished = (bool) $company->newsroom_published;
     }
 
     public function save(): void
@@ -88,6 +92,7 @@ class Branding extends Component
                 'linkedin' => $this->linkedin ?: null,
             ]),
             'blanket_media_release_text' => $this->blanketReleaseText ?: null,
+            'newsroom_published' => $this->newsroomPublished,
         ];
 
         if ($this->logo instanceof TemporaryUploadedFile) {

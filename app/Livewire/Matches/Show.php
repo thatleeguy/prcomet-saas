@@ -5,7 +5,11 @@ namespace App\Livewire\Matches;
 use App\Jobs\FetchPlacementMetadataJob;
 use App\Models\MatchEvent;
 use App\Models\MatchRecord;
+use App\Models\PitchDraft;
 use App\Models\PublicationItem;
+use App\Services\Llm\BudgetExceededException;
+use App\Services\Llm\LlmClient;
+use App\Services\Llm\Prompts\PitchDraftPrompt;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -24,6 +28,9 @@ class Show extends Component
 
     #[Validate('nullable|url|max:1000')]
     public string $placementUrl = '';
+
+    /** Tone selector for the AI pitch draft section. */
+    public string $pitchTone = PitchDraft::TONE_DIRECT;
 
     public function mount(MatchRecord $match): void
     {
@@ -118,6 +125,100 @@ class Show extends Component
 
         $this->note = '';
         $this->match->load('events.user');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI pitch draft
+    |--------------------------------------------------------------------------
+    | Generates a cold-outreach email tailored to the journalist + release.
+    | Gated behind the team's paid LLM features flag (reuses
+    | llm_observatory_enabled — same conceptual upgrade).
+    */
+
+    public function setPitchTone(string $tone): void
+    {
+        if (! array_key_exists($tone, PitchDraft::TONES)) {
+            return;
+        }
+        $this->pitchTone = $tone;
+    }
+
+    #[Computed]
+    public function aiEnabled(): bool
+    {
+        return $this->match->company?->team?->llmObservatoryEnabled() ?? false;
+    }
+
+    /**
+     * The current draft for the active tone, if one's already been
+     * generated. The view reads this to decide between "generate" and
+     * "show existing".
+     */
+    #[Computed]
+    public function currentDraft(): ?PitchDraft
+    {
+        return PitchDraft::where('match_id', $this->match->id)
+            ->where('tone', $this->pitchTone)
+            ->latest('updated_at')
+            ->first();
+    }
+
+    /**
+     * The journalist's mailto recipient — when we have an email on
+     * file we prefill it; otherwise the mailto opens with an empty To.
+     */
+    #[Computed]
+    public function recipientEmail(): ?string
+    {
+        return $this->match->author?->email;
+    }
+
+    public function generatePitchDraft(LlmClient $llm): void
+    {
+        if (! $this->aiEnabled) {
+            session()->flash('error', 'AI pitch drafts require the paid LLM upgrade. Contact us to enable.');
+            return;
+        }
+
+        // Look up the published one-pager URL when there is one — that's
+        // the natural CTA in the email body.
+        $onePagerUrl = null;
+        $page = $this->match->onePager()->first();
+        if ($page && $page->isPublished()) {
+            $onePagerUrl = $page->publicUrl();
+        }
+
+        try {
+            $result = PitchDraftPrompt::run($llm, $this->match, $this->pitchTone, $onePagerUrl);
+        } catch (BudgetExceededException) {
+            session()->flash('error', 'LLM budget reached. Drafts pause until the window rolls.');
+            return;
+        } catch (\Throwable $e) {
+            report($e);
+            session()->flash('error', 'Draft failed: '.$e->getMessage());
+            return;
+        }
+
+        if ($result === null) {
+            session()->flash('error', 'Claude returned an unparseable response. Try again or pick a different tone.');
+            return;
+        }
+
+        // Upsert by (match, tone) so re-running overwrites in place.
+        PitchDraft::updateOrCreate(
+            ['match_id' => $this->match->id, 'tone' => $this->pitchTone],
+            [
+                'subject' => $result['subject'],
+                'body' => $result['body'],
+                'generated_by_user_id' => auth()->id(),
+            ],
+        );
+
+        // Bust the computed cache so the view picks up the new row.
+        unset($this->currentDraft);
+
+        session()->flash('status', 'Draft generated.');
     }
 
     public function render()

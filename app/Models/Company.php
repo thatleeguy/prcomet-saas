@@ -28,6 +28,8 @@ class Company extends Model
     protected $fillable = [
         'team_id',
         'name',
+        'slug',
+        'newsroom_published',
         'ticker',
         'exchange',
         'website',
@@ -59,8 +61,34 @@ class Company extends Model
             'sector_tags' => 'array',
             'social_links' => 'array',
             'is_active' => 'boolean',
+            'newsroom_published' => 'boolean',
             'last_ingested_at' => 'datetime',
         ];
+    }
+
+    public function getRouteKeyName(): string
+    {
+        // Public newsroom routes bind by slug; everything else
+        // continues to use the id.
+        return request()->routeIs('newsroom.*') ? 'slug' : 'id';
+    }
+
+    protected static function booted(): void
+    {
+        // Auto-slug on create from the name so new companies always
+        // have a stable newsroom URL. Per-row uniqueness loop in case
+        // two companies share a name across teams.
+        static::creating(function (Company $c) {
+            if (! $c->slug) {
+                $base = \Illuminate\Support\Str::slug((string) $c->name) ?: 'company';
+                $slug = $base;
+                $i = 2;
+                while (static::where('slug', $slug)->exists()) {
+                    $slug = $base.'-'.$i++;
+                }
+                $c->slug = $slug;
+            }
+        });
     }
 
     public function team(): BelongsTo

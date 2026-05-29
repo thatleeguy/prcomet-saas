@@ -19,6 +19,11 @@ Route::get('/', function () {
 Route::get('/onepagers/{uuid}', [\App\Http\Controllers\OnePagerController::class, 'show'])
     ->name('onepagers.show');
 
+// Public newsroom — permanent directory of a company's published one-pagers.
+// Slug-keyed; 404s when newsroom_published is false.
+Route::get('/newsroom/{company}', [\App\Http\Controllers\NewsroomController::class, 'show'])
+    ->name('newsroom.show');
+
 // Stop impersonating. Available to any authenticated user since the
 // impersonated user is the one signed in here; controller verifies state.
 Route::post('/impersonate/stop', [\App\Http\Controllers\ImpersonationController::class, 'stop'])

@@ -153,6 +153,35 @@
                 </div>
             </section>
 
+            {{-- Public newsroom toggle ─────────────────────────────────
+                 Customer-controlled visibility for the
+                 /newsroom/{slug} page — the permanent home for every
+                 one-pager the company publishes. --}}
+            <section class="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
+                <div>
+                    <h2 class="text-sm font-semibold text-slate-900">Public newsroom</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">A permanent, branded page listing every one-pager you publish. Share the URL with journalists so they can bookmark you.</p>
+                </div>
+
+                <label class="flex items-start gap-2.5 cursor-pointer">
+                    <input type="checkbox" wire:model.live="newsroomPublished" class="mt-1 rounded border-slate-300 text-brand-600 focus:ring-brand-500" />
+                    <div class="flex-1">
+                        <div class="text-sm font-medium text-slate-900">Publish newsroom</div>
+                        <div class="text-xs text-slate-500 mt-0.5">When off the page 404s. Existing one-pager URLs are unaffected either way.</div>
+                    </div>
+                </label>
+
+                @if ($newsroomPublished)
+                    <div class="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 flex items-center justify-between gap-3">
+                        <div class="min-w-0">
+                            <div class="text-xs font-semibold text-emerald-700 uppercase tracking-wider mb-1">Live at</div>
+                            <div class="font-mono text-sm text-emerald-900 truncate">{{ url('/newsroom/'.$company->slug) }}</div>
+                        </div>
+                        <a href="{{ url('/newsroom/'.$company->slug) }}" target="_blank" rel="noopener" class="btn-secondary text-xs whitespace-nowrap">Open ↗</a>
+                    </div>
+                @endif
+            </section>
+
             <div class="flex justify-end">
                 <button type="submit" wire:loading.attr="disabled" class="btn-primary">
                     <span wire:loading.remove>Save branding</span>
