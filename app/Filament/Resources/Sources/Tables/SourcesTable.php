@@ -29,8 +29,8 @@ class SourcesTable
             ->columns([
                 TextColumn::make('name')->searchable()->sortable()->wrap(),
                 TextColumn::make('type')->badge()->sortable(),
-                TextColumn::make('sourceGroup.name')
-                    ->label('Catalogue')
+                TextColumn::make('sourceGroups.name')
+                    ->label('Catalogues')
                     ->badge()
                     ->color('primary')
                     ->placeholder('—')
@@ -43,9 +43,10 @@ class SourcesTable
                 TextColumn::make('items_count')->counts('items')->label('Items'),
             ])
             ->filters([
-                SelectFilter::make('source_group_id')
+                SelectFilter::make('sourceGroups')
                     ->label('Catalogue')
-                    ->options(fn () => SourceGroup::orderBy('name')->pluck('name', 'id')->toArray()),
+                    ->relationship('sourceGroups', 'name')
+                    ->preload(),
                 SelectFilter::make('type')->options([
                     Source::TYPE_PUBLICATION => 'Publication',
                     Source::TYPE_PODCAST => 'Podcast',

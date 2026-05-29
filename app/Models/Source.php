@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -15,12 +16,18 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * ingest and analyze for matches against company press releases.
  *
  * Visibility model:
- *   - A source belongs to one SourceGroup (a catalogue like "Mining
- *     Publications"). Teams subscribe to groups; that subscription
- *     drives which sources are visible to which teams.
+ *   - A source can belong to multiple catalogues (M2M via
+ *     source_group_source). Teams subscribe to catalogues; the union
+ *     of a team's subscribed catalogues drives which sources are
+ *     visible to them.
  *   - The legacy `team` scope (a team's private custom source) still
  *     works as an escape hatch for one-off feeds a customer needs
  *     without operator involvement.
+ *
+ * Ingestion is per-source, not per-catalogue: each source has one
+ * feed_url, one IngestSourceJob, one stream of PublicationItems.
+ * Catalogue membership only affects which teams see the resulting
+ * items via Source::visibleTo.
  *
  * Soft deletes: removing a source from the operator UI sets
  * deleted_at instead of physically dropping it, so the matches /
@@ -44,7 +51,6 @@ class Source extends Model
     protected $fillable = [
         'scope',
         'team_id',
-        'source_group_id',
         'type',
         'name',
         'base_url',
@@ -71,9 +77,15 @@ class Source extends Model
         return $this->belongsTo(Team::class);
     }
 
-    public function sourceGroup(): BelongsTo
+    /**
+     * Catalogues this source appears in. A single source can sit in
+     * several — eg. an ESG metals podcast lives in both Mining and
+     * Clean Energy without being duplicated.
+     */
+    public function sourceGroups(): BelongsToMany
     {
-        return $this->belongsTo(SourceGroup::class);
+        return $this->belongsToMany(SourceGroup::class, 'source_group_source')
+            ->withTimestamps();
     }
 
     public function items(): HasMany
@@ -83,11 +95,12 @@ class Source extends Model
 
     /**
      * Sources visible to a given team. Union of:
-     *   - Sources in any active group the team currently subscribes to
+     *   - Sources in any active catalogue the team currently subscribes
+     *     to (where the subscription hasn't expired)
      *   - The team's own private (scope=team) sources
-     *   - Legacy global sources NOT yet assigned to a group — kept on
-     *     so a pre-Catalog install keeps working until the operator
-     *     pins each source into a group.
+     *   - Legacy global sources not in any catalogue — kept on so a
+     *     pre-Catalog install keeps working until the operator pins
+     *     each source into one or more groups.
      */
     public function scopeVisibleTo(Builder $query, Team $team): Builder
     {
@@ -97,17 +110,26 @@ class Source extends Model
             ->pluck('source_groups.id');
 
         return $query->where(function (Builder $q) use ($team, $subscribedGroupIds) {
-            $q->whereIn('source_group_id', $subscribedGroupIds)
+            $q->whereExists(function ($sub) use ($subscribedGroupIds) {
+                $sub->select('source_id')
+                    ->from('source_group_source')
+                    ->whereColumn('source_group_source.source_id', 'sources.id')
+                    ->whereIn('source_group_source.source_group_id', $subscribedGroupIds);
+            })
                 ->orWhere(function (Builder $inner) use ($team) {
                     $inner->where('scope', self::SCOPE_TEAM)
                         ->where('team_id', $team->id);
                 })
                 ->orWhere(function (Builder $legacy) {
-                    // Unassigned global sources stay visible to everyone until
-                    // the operator assigns them to a group. Stops a fresh
-                    // install from looking empty during migration.
+                    // Global sources not in any catalogue stay visible to
+                    // everyone until the operator pins them. Avoids a
+                    // pre-Catalog install going dark mid-migration.
                     $legacy->where('scope', self::SCOPE_GLOBAL)
-                        ->whereNull('source_group_id');
+                        ->whereNotExists(function ($sub) {
+                            $sub->select('source_id')
+                                ->from('source_group_source')
+                                ->whereColumn('source_group_source.source_id', 'sources.id');
+                        });
                 });
         });
     }

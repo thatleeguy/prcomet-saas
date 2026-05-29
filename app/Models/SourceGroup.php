@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -46,9 +45,15 @@ class SourceGroup extends Model
         ];
     }
 
-    public function sources(): HasMany
+    /**
+     * Sources tagged into this catalogue. A single source can be in
+     * several catalogues without being duplicated; the pivot is the
+     * single source of truth.
+     */
+    public function sources(): BelongsToMany
     {
-        return $this->hasMany(Source::class);
+        return $this->belongsToMany(Source::class, 'source_group_source')
+            ->withTimestamps();
     }
 
     public function teams(): BelongsToMany

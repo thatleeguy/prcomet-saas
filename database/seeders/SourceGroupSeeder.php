@@ -76,12 +76,17 @@ class SourceGroupSeeder extends Seeder
             ]
         );
 
-        // Pin every existing un-grouped global source into the Mining
+        // Pin every existing un-tagged global source into the Mining
         // catalogue so the team-visible corpus survives the migration.
-        Source::query()
+        // M2M attach via the pivot — same source can be in several
+        // catalogues without being duplicated.
+        $unTagged = Source::query()
             ->where('scope', Source::SCOPE_GLOBAL)
-            ->whereNull('source_group_id')
-            ->update(['source_group_id' => $mining->id]);
+            ->whereDoesntHave('sourceGroups')
+            ->pluck('id');
+        if ($unTagged->isNotEmpty()) {
+            $mining->sources()->syncWithoutDetaching($unTagged);
+        }
 
         // Seed a few representative sources into each premium catalogue
         // so the operator UI shows real content out of the box.
@@ -121,18 +126,21 @@ class SourceGroupSeeder extends Seeder
     private function seedSources(SourceGroup $group, array $rows): void
     {
         foreach ($rows as $row) {
-            Source::updateOrCreate(
+            $source = Source::updateOrCreate(
                 ['scope' => Source::SCOPE_GLOBAL, 'name' => $row['name']],
                 array_merge($row, [
                     'scope' => Source::SCOPE_GLOBAL,
                     'team_id' => null,
-                    'source_group_id' => $group->id,
                     'ingest_strategy' => 'rss',
                     'is_active' => true,
                     'base_url' => $row['base_url'] ?? null,
                     'tags' => $row['tags'] ?? [],
                 ])
             );
+
+            // syncWithoutDetaching so re-running the seeder doesn't
+            // drop the source's membership in other catalogues.
+            $group->sources()->syncWithoutDetaching([$source->id]);
         }
     }
 }
