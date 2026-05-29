@@ -7,18 +7,23 @@
             'unknown' => ['dot' => 'bg-slate-400',   'chip' => 'bg-slate-100 text-slate-600 ring-slate-200',     'label' => 'Unknown'],
         ];
         $checkMeta = [
-            'scheduler' => ['title' => 'Scheduler',  'subtitle' => 'php artisan schedule:run (every minute)'],
+            'scheduler' => ['title' => 'Scheduler',    'subtitle' => 'php artisan schedule:run (every minute)'],
             'queue'     => ['title' => 'Queue worker', 'subtitle' => 'php artisan queue:work'],
-            'database'  => ['title' => 'Database',   'subtitle' => 'Primary DB connection'],
-            'storage'   => ['title' => 'Storage',    'subtitle' => 'Default filesystem disk'],
-            'anthropic' => ['title' => 'Anthropic',  'subtitle' => 'Claude API key'],
+            'database'  => ['title' => 'Database',     'subtitle' => 'Primary DB connection'],
+            'storage'   => ['title' => 'Storage',      'subtitle' => 'Default filesystem disk'],
+            'anthropic' => ['title' => 'Anthropic',    'subtitle' => 'Claude API key'],
         ];
     @endphp
 
     <div class="space-y-6">
 
-        {{-- Top-line check cards --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        {{-- Top-line check cards.
+             Each card renders the status, the freshness message, and a
+             "Setup commands" disclosure with the env vars + shell
+             commands needed to configure that subsystem. The disclosure
+             is open by default when the check is not green so the fix
+             is one glance away from the failure. --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             @foreach ($checks as $key => $check)
                 @php $style = $statusStyle[$check['status']] ?? $statusStyle['unknown']; @endphp
                 <div class="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 p-4">
@@ -52,6 +57,45 @@
                                 <div class="text-[10px] text-gray-500 uppercase tracking-wider">Failed</div>
                             </div>
                         </div>
+                    @endif
+
+                    {{-- Setup recipe. <details> gives us native disclosure
+                         with no JS; the `open` attribute is conditional on
+                         status so the operator sees the fix immediately
+                         when something's wrong. --}}
+                    @if (! empty($check['setup']))
+                        <details class="mt-4 group" @if ($check['status'] !== 'ok') open @endif>
+                            <summary class="cursor-pointer text-[11px] font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-1.5 select-none">
+                                <svg class="h-3 w-3 text-gray-400 transition-transform group-open:rotate-90" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                                Setup commands
+                            </summary>
+
+                            <div class="mt-3 space-y-3">
+                                @if (! empty($check['setup']['env']))
+                                    <div>
+                                        <div class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Environment variables</div>
+                                        <pre class="text-[11px] leading-snug font-mono bg-gray-900 text-gray-100 dark:bg-gray-950 rounded-md p-3 overflow-x-auto whitespace-pre">{{ implode("\n", $check['setup']['env']) }}</pre>
+                                    </div>
+                                @endif
+
+                                @if (! empty($check['setup']['commands']))
+                                    <div>
+                                        <div class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Commands</div>
+                                        <pre class="text-[11px] leading-snug font-mono bg-gray-900 text-gray-100 dark:bg-gray-950 rounded-md p-3 overflow-x-auto whitespace-pre">{{ implode("\n", $check['setup']['commands']) }}</pre>
+                                    </div>
+                                @endif
+
+                                @if (! empty($check['setup']['forge_notes']))
+                                    <p class="text-[11px] text-gray-500 leading-relaxed">
+                                        <span class="inline-flex items-center gap-1 font-semibold text-gray-700 dark:text-gray-300">
+                                            <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                                            Forge
+                                        </span>
+                                        {{ $check['setup']['forge_notes'] }}
+                                    </p>
+                                @endif
+                            </div>
+                        </details>
                     @endif
                 </div>
             @endforeach
