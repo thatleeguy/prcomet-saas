@@ -24,6 +24,15 @@ Route::get('/onepagers/{uuid}', [\App\Http\Controllers\OnePagerController::class
 Route::get('/newsroom/{company}', [\App\Http\Controllers\NewsroomController::class, 'show'])
     ->name('newsroom.show');
 
+// Subscriber self-manage surface. Token-based, no password — Substack style.
+// Token reveals subscription preferences only for that one identity.
+Route::get('/subscriptions/confirm/{token}', [\App\Http\Controllers\SubscriptionsController::class, 'confirm'])
+    ->name('subscriptions.confirm');
+Route::get('/subscriptions/unsubscribe/{token}', [\App\Http\Controllers\SubscriptionsController::class, 'unsubscribeAll'])
+    ->name('subscriptions.unsubscribe-all');
+Route::get('/subscriptions/{token}', \App\Livewire\Subscriptions\Manage::class)
+    ->name('subscriptions.manage');
+
 // Stop impersonating. Available to any authenticated user since the
 // impersonated user is the one signed in here; controller verifies state.
 Route::post('/impersonate/stop', [\App\Http\Controllers\ImpersonationController::class, 'stop'])

@@ -1,8 +1,8 @@
 <div>
     @if ($submitted)
         <div class="rounded-xl px-5 py-4 text-sm accent-fade-bg border border-slate-200">
-            <div class="font-semibold text-slate-900 mb-0.5">You're in.</div>
-            <div class="text-xs text-slate-600">We'll email you when {{ $company->name }} publishes something new here.</div>
+            <div class="font-semibold text-slate-900 mb-0.5">{{ $resultMessage }}</div>
+            <div class="text-xs text-slate-600 leading-relaxed">{{ $resultBody }}</div>
         </div>
     @else
         <form wire:submit="subscribe" class="flex flex-col sm:flex-row gap-2">
@@ -17,5 +17,8 @@
         @error('email')
             <p class="text-xs text-rose-600 mt-1.5">{{ $message }}</p>
         @enderror
+        <p class="text-[11px] text-slate-500 mt-2 leading-relaxed">
+            Subscriptions are managed by <span class="font-medium text-slate-700">PrComet</span>. One inbox-friendly digest covers every company you follow. Unsubscribe anytime.
+        </p>
     @endif
 </div>

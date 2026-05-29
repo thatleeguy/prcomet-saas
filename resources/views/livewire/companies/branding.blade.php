@@ -206,6 +206,17 @@
                 </label>
 
                 @if ($newsroomPublished)
+                    @php
+                        $followerCount = \App\Models\NewsroomSubscription::query()
+                            ->where('company_id', $company->id)
+                            ->whereNull('unsubscribed_at')
+                            ->count();
+                        $networkSize = \App\Models\NewsroomSubscriber::query()
+                            ->whereNotNull('confirmed_at')
+                            ->whereNull('unsubscribed_at')
+                            ->count();
+                    @endphp
+
                     <div class="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 flex items-center justify-between gap-3">
                         <div class="min-w-0">
                             <div class="text-xs font-semibold text-emerald-700 uppercase tracking-wider mb-1">Live at</div>
@@ -213,6 +224,21 @@
                         </div>
                         <a href="{{ url('/newsroom/'.$company->slug) }}" target="_blank" rel="noopener" class="btn-secondary text-xs whitespace-nowrap">Open ↗</a>
                     </div>
+
+                    {{-- Network framing — your subscribers vs network total. --}}
+                    <div class="grid grid-cols-2 gap-3 mt-3">
+                        <div class="rounded-md border border-slate-200 bg-white px-4 py-3">
+                            <div class="text-2xl font-semibold tabular text-slate-900">{{ $followerCount }}</div>
+                            <div class="text-[10px] text-slate-500 uppercase tracking-wider mt-0.5">Your followers</div>
+                        </div>
+                        <div class="rounded-md border border-slate-200 bg-white px-4 py-3">
+                            <div class="text-2xl font-semibold tabular text-slate-900">{{ $networkSize }}</div>
+                            <div class="text-[10px] text-slate-500 uppercase tracking-wider mt-0.5">PrComet network</div>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                        Subscribers are managed by PrComet. People who subscribe to your newsroom can also follow other companies on the network — they get one digest from us, not N from each of you. That keeps inboxes quiet and unsubscribe rates low.
+                    </p>
                 @endif
             </section>
 

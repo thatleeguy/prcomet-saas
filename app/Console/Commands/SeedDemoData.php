@@ -88,6 +88,7 @@ class SeedDemoData extends Command
             $this->seedMediaAssets($company, $releases);
             $onePager = $this->seedOnePager($matches['placed'], $company, $user);
             $this->seedObservatory($team, $company, $user);
+            $this->seedNewsroomSubscribers($company);
 
             $this->printSummary($user, $team, $company, $onePager);
         });
@@ -992,6 +993,46 @@ SVG;
             'terms' => ['Newmont', 'Newmont Mining', 'Newmont Goldcorp', 'NEM'],
             'mode' => Watch::MODE_LITERAL_LLM,
         ]);
+    }
+
+    /**
+     * Seed a handful of newsroom subscribers so the customer's
+     * Branding panel shows meaningful follower numbers on first
+     * login, and so the manage-subscriptions page has a believable
+     * preview when the operator clicks through.
+     *
+     * Uses the shared identity model: a few of these subscribers
+     * follow multiple companies across the install so the network
+     * effect is visible in the demo.
+     */
+    private function seedNewsroomSubscribers(Company $company): void
+    {
+        $samples = [
+            ['email' => 'rob.sinclair@example.com',  'name' => 'Rob Sinclair',  'cadence' => 'weekly',  'confirmed' => true],
+            ['email' => 'maria.cardoso@example.com', 'name' => 'Maria Cardoso', 'cadence' => 'daily',   'confirmed' => true],
+            ['email' => 'wei.tan@example.com',       'name' => 'Wei Tan',       'cadence' => 'weekly',  'confirmed' => true],
+            ['email' => 'jess.morrow@example.com',   'name' => 'Jess Morrow',   'cadence' => 'instant', 'confirmed' => true],
+            ['email' => 'leah.kerner@example.com',   'name' => 'Leah Kerner',   'cadence' => 'weekly',  'confirmed' => false],
+            ['email' => 'sam.byrne@example.com',     'name' => 'Sam Byrne',     'cadence' => 'weekly',  'confirmed' => true],
+        ];
+
+        foreach ($samples as $spec) {
+            $subscriber = \App\Models\NewsroomSubscriber::firstOrCreate(
+                ['email_hashed' => \App\Models\NewsroomSubscriber::hashEmail($spec['email'])],
+                [
+                    'email' => $spec['email'],
+                    'name' => $spec['name'],
+                    'cadence' => $spec['cadence'],
+                    'confirmed_at' => $spec['confirmed'] ? now()->subDays(3) : null,
+                    'source_ref' => 'demo-seed',
+                ],
+            );
+
+            \App\Models\NewsroomSubscription::firstOrCreate(
+                ['newsroom_subscriber_id' => $subscriber->id, 'company_id' => $company->id],
+                ['subscribed_at' => now()->subDays(rand(1, 30))],
+            );
+        }
     }
 
     private function printSummary(User $user, Team $team, Company $company, OnePager $onePager): void

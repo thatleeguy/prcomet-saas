@@ -2,15 +2,12 @@
 
 namespace App\Providers;
 
-use App\Listeners\NotifyAdminsOfTeamSignup;
 use App\Services\Llm\AnthropicLlmClient;
 use App\Services\Llm\FakeLlmClient;
 use App\Services\Llm\LlmClient;
 use App\Services\PriceData\PriceProvider;
 use App\Services\PriceData\StubPriceProvider;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
-use Laravel\Jetstream\Events\TeamCreated;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -40,8 +37,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Explicit event wiring — clearer than auto-discovery and the listener
-        // count is small. Easy to find when chasing "who handles this event?"
-        Event::listen(TeamCreated::class, NotifyAdminsOfTeamSignup::class);
+        // Event ↔ listener wiring lives in the framework's default
+        // auto-discovery path: any class under App\Listeners with a
+        // typed handle(EventClass $event) method is registered
+        // automatically. Explicit Event::listen calls double-register
+        // and double-fire, which we already learned the painful way.
     }
 }

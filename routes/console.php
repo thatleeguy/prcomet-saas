@@ -52,6 +52,15 @@ Schedule::call(function () {
         ->each(fn (Source $s) => IngestSourceJob::dispatch($s->id));
 })->everyThirtyMinutes()->name('ingest-sources')->withoutOverlapping();
 
+// Newsroom subscriber digests — sweep every 10 minutes for cadences
+// that are due. The job itself is the rate gate: it only sends when
+// the subscriber's cadence interval has elapsed AND they have new
+// stories to read.
+Schedule::job(new \App\Jobs\DispatchSubscriptionDigestsJob)
+    ->everyTenMinutes()
+    ->name('dispatch-subscription-digests')
+    ->withoutOverlapping();
+
 // Match digests — daily at 13:00 UTC (≈ 9am ET / 6am PT — tweak by user
 // timezone post-launch). Each user's job decides based on their cadence.
 Schedule::call(function () {

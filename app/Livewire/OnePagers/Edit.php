@@ -193,10 +193,20 @@ class Edit extends Component
     public function publish(): void
     {
         $this->save();
+
+        $wasAlreadyPublished = $this->onePager->status === OnePager::STATUS_PUBLISHED;
+
         $this->onePager->update([
             'status' => OnePager::STATUS_PUBLISHED,
             'published_at' => $this->onePager->published_at ?? now(),
         ]);
+
+        // Only fire the subscriber-fanout event on the publish
+        // transition (not re-saves of an already-published page).
+        if (! $wasAlreadyPublished) {
+            \App\Events\OnePagerPublished::dispatch($this->onePager->fresh());
+        }
+
         session()->flash('status', 'Published. Share the URL with journalists.');
     }
 

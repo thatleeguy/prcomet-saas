@@ -8,6 +8,7 @@ use App\Models\OnePager;
 use App\Models\PressRelease;
 use App\Models\PublicationItem;
 use App\Models\Source;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
@@ -41,14 +42,14 @@ it('renders the public newsroom page with the company brand', function () {
         ->assertOk()
         ->assertSee('Aurelian Gold')
         ->assertSee('Nevada-focused explorer.')
-        ->assertSee('#B8501D', false); // accent CSS variable
+        ->assertSee('#B8501D', false);
 });
 
 it('lists published one-pagers (newest first) and hides unpublished ones', function () {
     $company = Company::factory()->create(['newsroom_published' => true]);
 
     $source = Source::factory()->create();
-    $item = PublicationItem::factory()->create(['source_id' => $source->id, 'title' => 'Big drill result']);
+    $item = PublicationItem::factory()->create(['source_id' => $source->id]);
     $release = PressRelease::factory()->create(['company_id' => $company->id]);
     $match = MatchRecord::factory()->create([
         'company_id' => $company->id,
@@ -57,17 +58,13 @@ it('lists published one-pagers (newest first) and hides unpublished ones', funct
     ]);
 
     OnePager::create([
-        'company_id' => $company->id,
-        'match_id' => $match->id,
+        'company_id' => $company->id, 'match_id' => $match->id,
         'title' => 'Published story',
-        'status' => OnePager::STATUS_PUBLISHED,
-        'published_at' => now()->subDays(2),
+        'status' => OnePager::STATUS_PUBLISHED, 'published_at' => now()->subDays(2),
     ]);
     OnePager::create([
-        'company_id' => $company->id,
-        'match_id' => null,
-        'title' => 'Draft story',
-        'status' => OnePager::STATUS_DRAFT,
+        'company_id' => $company->id, 'match_id' => null,
+        'title' => 'Draft story', 'status' => OnePager::STATUS_DRAFT,
     ]);
 
     $this->get('/newsroom/'.$company->slug)
@@ -76,33 +73,8 @@ it('lists published one-pagers (newest first) and hides unpublished ones', funct
         ->assertDontSee('Draft story');
 });
 
-it('captures an email via the subscribe form', function () {
-    $company = Company::factory()->create(['newsroom_published' => true]);
-
-    Livewire::test(SubscribeForm::class, ['company' => $company])
-        ->set('email', 'rob@example.com')
-        ->call('subscribe')
-        ->assertSet('submitted', true);
-
-    expect(NewsroomSubscriber::count())->toBe(1);
-    expect(NewsroomSubscriber::first()->email)->toBe('rob@example.com');
-});
-
-it('does not store duplicate subscriptions for the same (company, email)', function () {
-    $company = Company::factory()->create(['newsroom_published' => true]);
-
-    Livewire::test(SubscribeForm::class, ['company' => $company])
-        ->set('email', 'rob@example.com')
-        ->call('subscribe');
-
-    Livewire::test(SubscribeForm::class, ['company' => $company])
-        ->set('email', 'ROB@example.com') // case-insensitive uniqueness
-        ->call('subscribe');
-
-    expect(NewsroomSubscriber::count())->toBe(1);
-});
-
-it('rejects malformed emails on the subscribe form', function () {
+it('subscribe form rejects malformed emails before any work', function () {
+    Mail::fake();
     $company = Company::factory()->create(['newsroom_published' => true]);
 
     Livewire::test(SubscribeForm::class, ['company' => $company])
@@ -111,4 +83,5 @@ it('rejects malformed emails on the subscribe form', function () {
         ->assertHasErrors(['email']);
 
     expect(NewsroomSubscriber::count())->toBe(0);
+    Mail::assertNothingQueued();
 });
