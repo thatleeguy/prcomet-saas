@@ -3,13 +3,7 @@
 namespace App\Filament\Resources\SourceGroups\Tables;
 
 use App\Models\SourceGroup;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ForceDeleteBulkAction;
-use Filament\Actions\RestoreAction;
-use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
@@ -63,18 +57,18 @@ class SourceGroupsTable
                 TernaryFilter::make('is_active'),
                 TrashedFilter::make(),
             ])
+            // Delete + restore + force-delete intentionally live on the
+            // edit page only. Deleting a catalogue ripples across team
+            // subscriptions and Source::visibleTo for every customer in
+            // them, so the operator should be looking at the record
+            // before they pull the trigger.
+            // Edit stays visible on trashed records too — it's the
+            // only way back into the page where the restore action
+            // lives.
             ->recordActions([
-                EditAction::make()->visible(fn (SourceGroup $r) => ! $r->trashed()),
-                DeleteAction::make()->visible(fn (SourceGroup $r) => ! $r->trashed()),
-                RestoreAction::make(),
+                EditAction::make(),
             ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
-                ]),
-            ])
+            ->toolbarActions([])
             ->defaultSort('name');
     }
 }
