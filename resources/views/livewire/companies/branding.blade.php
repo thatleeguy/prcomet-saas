@@ -66,6 +66,40 @@
                 @endif
             </section>
 
+            {{-- Newsroom-specific header (optional override). Falls back to
+                 the main header above when unset — most customers won't need
+                 to touch this. Pictures an evergreen brand shot (CEO portrait,
+                 facility, project landscape) versus the more story-specific
+                 header that suits per-release one-pagers. --}}
+            <section class="bg-white border border-slate-200 rounded-xl p-6">
+                <div class="flex items-start justify-between gap-3 mb-1">
+                    <h2 class="text-sm font-semibold text-slate-900">Newsroom header <span class="text-xs font-normal text-slate-500">(optional)</span></h2>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">Used only on your public newsroom page. Leave blank to reuse the main header above — most companies do.</p>
+
+                <div class="aspect-[3/1] rounded-lg overflow-hidden border border-slate-200 bg-slate-50 mb-3">
+                    @if ($newsroomHeaderImage)
+                        <img src="{{ $newsroomHeaderImage->temporaryUrl() }}" class="w-full h-full object-cover" alt="Newsroom header preview" />
+                    @elseif ($company->newsroom_header_image_path)
+                        <img src="{{ \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url($company->newsroom_header_image_path) }}" class="w-full h-full object-cover" alt="Current newsroom header" />
+                    @elseif ($company->header_image_path)
+                        <div class="relative w-full h-full">
+                            <img src="{{ $company->headerImageUrl() }}" class="w-full h-full object-cover opacity-70" alt="Falling back to main header" />
+                            <div class="absolute inset-x-0 bottom-0 px-3 py-1.5 bg-slate-900/70 text-white text-[10px] uppercase tracking-wider">Falling back to main header</div>
+                        </div>
+                    @else
+                        <div class="w-full h-full grid place-items-center text-slate-300 text-[11px]">No header on file</div>
+                    @endif
+                </div>
+                <input type="file" wire:model="newsroomHeaderImage" accept="image/*"
+                       class="block w-full text-sm text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-medium file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200" />
+                <p class="text-[11px] text-slate-500 mt-1.5">Up to 10MB. JPEG or PNG.</p>
+                @error('newsroomHeaderImage') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                @if ($company->newsroom_header_image_path)
+                    <button type="button" wire:click="removeNewsroomHeader" class="text-xs text-rose-600 hover:text-rose-700 mt-2">Remove newsroom header (fall back to main)</button>
+                @endif
+            </section>
+
             <section class="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
                 <h2 class="text-sm font-semibold text-slate-900">Identity</h2>
 

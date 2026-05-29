@@ -30,6 +30,10 @@ class Branding extends Component
     #[Validate('nullable|image|max:10240')]
     public $headerImage;
 
+    /** Optional newsroom-specific header. Falls back to $headerImage when unset. */
+    #[Validate('nullable|image|max:10240')]
+    public $newsroomHeaderImage;
+
     #[Validate('nullable|regex:/^#[0-9A-Fa-f]{6}$/')]
     public string $accentColor = '';
 
@@ -105,6 +109,11 @@ class Branding extends Component
             $payload['header_image_path'] = $this->headerImage->store('branding/'.$this->company->id, config('filesystems.default'));
         }
 
+        if ($this->newsroomHeaderImage instanceof TemporaryUploadedFile) {
+            $this->deletePrevious($this->company->newsroom_header_image_path);
+            $payload['newsroom_header_image_path'] = $this->newsroomHeaderImage->store('branding/'.$this->company->id, config('filesystems.default'));
+        }
+
         if ($this->blanketReleaseFile instanceof TemporaryUploadedFile) {
             $this->deletePrevious($this->company->blanket_media_release_file_path);
             $payload['blanket_media_release_file_path'] = $this->blanketReleaseFile->store('media-releases/'.$this->company->id, config('filesystems.default'));
@@ -113,9 +122,17 @@ class Branding extends Component
         $this->company->update($payload);
         $this->logo = null;
         $this->headerImage = null;
+        $this->newsroomHeaderImage = null;
         $this->blanketReleaseFile = null;
 
         session()->flash('status', 'Branding updated.');
+    }
+
+    public function removeNewsroomHeader(): void
+    {
+        $this->deletePrevious($this->company->newsroom_header_image_path);
+        $this->company->update(['newsroom_header_image_path' => null]);
+        session()->flash('status', 'Newsroom header removed.');
     }
 
     public function removeBlanketReleaseFile(): void

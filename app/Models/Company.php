@@ -44,6 +44,7 @@ class Company extends Model
         // Branding
         'logo_path',
         'header_image_path',
+        'newsroom_header_image_path',
         'accent_color',
         'tagline',
         'description_md',
@@ -123,6 +124,20 @@ class Company extends Model
         return $this->header_image_path
             ? Storage::disk(config('filesystems.default'))->url($this->header_image_path)
             : null;
+    }
+
+    /**
+     * Header image for the public newsroom page. Falls back to the
+     * standard header image when the newsroom-specific one is unset,
+     * so customers who don't care about per-surface customisation
+     * get consistent branding for free.
+     */
+    public function newsroomHeaderImageUrl(): ?string
+    {
+        if ($this->newsroom_header_image_path) {
+            return Storage::disk(config('filesystems.default'))->url($this->newsroom_header_image_path);
+        }
+        return $this->headerImageUrl();
     }
 
     public function blanketMediaReleaseFileUrl(): ?string
