@@ -12,13 +12,19 @@ use Filament\Widgets\ChartWidget;
  */
 class MatchActivityChart extends ChartWidget
 {
-    protected static ?int $sort = 3;
+    // Sorted to the bottom of the dashboard so the at-a-glance stats
+    // (platform, LLM spend, match quality) land above the fold.
+    protected static ?int $sort = 100;
 
     protected ?string $heading = 'Match surfacing & placements';
 
     protected ?string $description = 'Daily output of the matching engine over the last 30 days.';
 
     protected int|string|array $columnSpan = 'full';
+
+    // Capped so the chart doesn't dominate the dashboard when the data
+    // set is sparse. Chart.js auto-sizes within this box.
+    protected ?string $maxHeight = '220px';
 
     public ?string $filter = '30';
 

@@ -85,6 +85,9 @@ class BootstrapFresh extends Command
         $this->info('Seeding global mining source corpus…');
         Artisan::call('db:seed', ['--class' => 'MiningSourceSeeder', '--force' => true]);
 
+        $this->info('Provisioning source catalogues and subscriptions…');
+        Artisan::call('db:seed', ['--class' => 'SourceGroupSeeder', '--force' => true]);
+
         foreach (self::USERS as $spec) {
             $this->createUser($spec);
         }
@@ -136,6 +139,17 @@ class BootstrapFresh extends Command
             ]));
 
             $user->forceFill(['current_team_id' => $team->id])->save();
+
+            // Auto-subscribe every bootstrapped team to the free Mining
+            // catalogue. The seeder will have created the group already.
+            if ($mining = \App\Models\SourceGroup::where('slug', 'mining-publications')->first()) {
+                $team->sourceGroups()->syncWithoutDetaching([
+                    $mining->id => [
+                        'is_complimentary' => false,
+                        'subscribed_at' => now(),
+                    ],
+                ]);
+            }
         });
     }
 

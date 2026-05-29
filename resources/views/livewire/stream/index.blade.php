@@ -40,6 +40,34 @@
 
     <div class="space-y-6 animate-fade-in">
 
+        {{-- Catalog subscriptions: what your team is paying for, shown as
+             chips so the customer always knows which corpora drive the
+             stream they're seeing. Purely informational — no pricing or
+             upsell language; the operator manages access from /manage. --}}
+        @if ($this->subscribedGroups->isNotEmpty())
+            <section class="bg-white border border-slate-200 rounded-xl p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Your catalog</div>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach ($this->subscribedGroups as $g)
+                                <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-sm">
+                                    @if ($g->icon_emoji)
+                                        <span>{{ $g->icon_emoji }}</span>
+                                    @endif
+                                    <span class="font-medium text-slate-900">{{ $g->name }}</span>
+                                    <span class="text-xs text-slate-500 tabular">{{ $g->sources_count }} sources</span>
+                                    @if ($g->is_premium)
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium uppercase tracking-wider bg-gradient-to-r from-indigo-100 via-violet-100 to-fuchsia-100 text-indigo-700">Premium</span>
+                                    @endif
+                                </span>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </section>
+        @endif
+
         {{-- Stats strip --}}
         <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
             @foreach ([

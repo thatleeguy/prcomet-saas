@@ -30,6 +30,14 @@ class SourceForm
                     ->visible(fn ($get) => $get('scope') === Source::SCOPE_TEAM)
                     ->requiredIf('scope', Source::SCOPE_TEAM),
 
+                Select::make('source_group_id')
+                    ->relationship('sourceGroup', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->label('Catalogue')
+                    ->helperText('Which subscribable catalogue this source belongs to. Sources in a catalogue are visible to every team subscribed to it.')
+                    ->visible(fn ($get) => $get('scope') === Source::SCOPE_GLOBAL),
+
                 Select::make('type')
                     ->required()
                     ->options([

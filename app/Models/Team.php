@@ -6,6 +6,7 @@ use App\Mail\TeamActivated;
 use Database\Factories\TeamFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Jetstream\Events\TeamCreated;
@@ -85,6 +86,19 @@ class Team extends JetstreamTeam
     public function companies(): HasMany
     {
         return $this->hasMany(Company::class);
+    }
+
+    /**
+     * Catalogues this team subscribes to. The pivot carries provenance
+     * (when it was granted, by whom, complimentary vs paid, expiry).
+     * Source::visibleTo joins through this so the team's corpus reflects
+     * exactly which catalogues they pay for.
+     */
+    public function sourceGroups(): BelongsToMany
+    {
+        return $this->belongsToMany(SourceGroup::class, 'source_group_subscriptions')
+            ->withPivot(['is_complimentary', 'subscribed_at', 'expires_at', 'granted_by_user_id', 'notes'])
+            ->withTimestamps();
     }
 
     /**

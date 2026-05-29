@@ -49,6 +49,22 @@ class Index extends Component
         return Source::visibleTo(auth()->user()->currentTeam)->pluck('id');
     }
 
+    /**
+     * Catalogues the team is currently subscribed to. Renders as chips
+     * above the stream so the customer always knows which corpus drives
+     * what they're seeing. Premium catalogues get a small badge.
+     */
+    #[Computed]
+    public function subscribedGroups()
+    {
+        return auth()->user()->currentTeam
+            ->sourceGroups()
+            ->where('is_active', true)
+            ->withCount('sources')
+            ->orderBy('name')
+            ->get();
+    }
+
     #[Computed]
     public function stats(): array
     {

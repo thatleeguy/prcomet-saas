@@ -13,6 +13,8 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class SourceResource extends Resource
 {
@@ -35,6 +37,17 @@ class SourceResource extends Resource
         return [
             //
         ];
+    }
+
+    /**
+     * Strip the soft-delete scope so the table can show trashed rows
+     * via the TrashedFilter. Without this override the table query
+     * silently excludes them and the filter is a no-op.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([SoftDeletingScope::class]);
     }
 
     public static function getPages(): array
