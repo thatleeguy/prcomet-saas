@@ -32,6 +32,7 @@
         .accent-fade-bg { background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 8%, white), color-mix(in srgb, var(--accent) 3%, white)); }
         .accent-divider { background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 50%, transparent), transparent); }
     </style>
+    <x-tracking />
 </head>
 <body class="font-sans antialiased text-slate-900 bg-white">
 

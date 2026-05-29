@@ -15,6 +15,7 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @livewireStyles
+        <x-tracking />
     </head>
     <body class="font-sans antialiased text-slate-900 bg-white min-h-screen flex flex-col">
 
