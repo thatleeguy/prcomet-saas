@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Teams;
 
 use App\Filament\Resources\Teams\Pages\EditTeam;
 use App\Filament\Resources\Teams\Pages\ListTeams;
+use App\Filament\Resources\Teams\RelationManagers\SourceGroupSubscriptionsRelationManager;
 use App\Filament\Resources\Teams\Schemas\TeamForm;
 use App\Filament\Resources\Teams\Tables\TeamsTable;
 use App\Models\Team;
@@ -46,6 +47,13 @@ class TeamResource extends Resource
     public static function canDelete($record): bool
     {
         return false;
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            SourceGroupSubscriptionsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

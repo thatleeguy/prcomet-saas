@@ -23,7 +23,10 @@ class TeamPolicy
      */
     public function view(User $user, Team $team): bool
     {
-        return $user->belongsToTeam($team);
+        // Super-admins can view any team via the /manage panel; the
+        // normal Jetstream rule (must be a member) still applies to
+        // regular users on their own surfaces.
+        return $user->is_admin || $user->belongsToTeam($team);
     }
 
     /**
@@ -39,7 +42,11 @@ class TeamPolicy
      */
     public function update(User $user, Team $team): bool
     {
-        return $user->ownsTeam($team);
+        // Super-admins manage every team from /manage (activation, seat
+        // limits, catalogue subscriptions, LLM upgrade). The Jetstream
+        // "owner" rule keeps applying to regular users for the customer
+        // surfaces (/dashboard/teams/{id}/edit).
+        return $user->is_admin || $user->ownsTeam($team);
     }
 
     /**
