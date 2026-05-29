@@ -2,9 +2,11 @@
 
 use App\Jobs\IngestCompanyRssJob;
 use App\Jobs\IngestSourceJob;
+use App\Jobs\QueueHeartbeatJob;
 use App\Jobs\SendMatchDigestsJob;
 use App\Models\Company;
 use App\Models\Source;
+use App\Models\SystemHeartbeat;
 use App\Models\User;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -19,6 +21,16 @@ Artisan::command('inspire', function () {
 | Scheduled jobs
 |--------------------------------------------------------------------------
 */
+
+// Liveness markers — these two beats are what /manage System health
+// reads to tell whether the Forge scheduler and queue worker are
+// actually running. They MUST stay every-minute; the dashboard treats
+// "no beat in the last 3 minutes" as red.
+Schedule::call(fn () => SystemHeartbeat::beat(SystemHeartbeat::KIND_SCHEDULER))
+    ->everyMinute()->name('heartbeat-scheduler');
+
+Schedule::job(new QueueHeartbeatJob)
+    ->everyMinute()->name('heartbeat-queue');
 
 // Poll every active company's RSS feed once an hour. Jobs queue independently
 // so a slow feed doesn't block the others.
