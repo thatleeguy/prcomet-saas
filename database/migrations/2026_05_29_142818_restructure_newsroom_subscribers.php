@@ -23,11 +23,20 @@ use Illuminate\Support\Facades\Schema;
  *   - Keeping the old shape around as a "v1" while introducing the
  *     new one would create two sources of truth that nothing
  *     would reconcile.
+ *
+ * MySQL note: the sibling migration that creates newsroom_subscriptions
+ * has the SAME timestamp and sorts BEFORE this one alphabetically,
+ * so it runs first and creates a FK from newsroom_subscriptions to
+ * newsroom_subscribers. MySQL refuses to drop the parent of a
+ * referenced FK, so we drop the FK here, swap the table, and re-add
+ * the FK afterwards.
  */
 return new class extends Migration
 {
     public function up(): void
     {
+        $this->detachPivotFk();
+
         Schema::dropIfExists('newsroom_subscribers');
 
         Schema::create('newsroom_subscribers', function (Blueprint $table) {
@@ -64,10 +73,14 @@ return new class extends Migration
             $table->unique('token');
             $table->index(['cadence', 'unsubscribed_at']);
         });
+
+        $this->reattachPivotFk();
     }
 
     public function down(): void
     {
+        $this->detachPivotFk();
+
         Schema::dropIfExists('newsroom_subscribers');
 
         // Restore the original per-company shape so down() leaves the
@@ -85,5 +98,56 @@ return new class extends Migration
             $table->unique(['company_id', 'email_hashed'], 'newsroom_subs_unique');
             $table->index('company_id');
         });
+
+        $this->reattachPivotFk();
+    }
+
+    /**
+     * Detach the FK from newsroom_subscriptions before dropping the
+     * parent table. Safe to call when the pivot or the FK doesn't
+     * exist yet (fresh install path).
+     */
+    private function detachPivotFk(): void
+    {
+        if (! Schema::hasTable('newsroom_subscriptions')) {
+            return;
+        }
+
+        try {
+            Schema::table('newsroom_subscriptions', function (Blueprint $table) {
+                $table->dropForeign(['newsroom_subscriber_id']);
+            });
+        } catch (\Throwable $e) {
+            // FK either doesn't exist (already dropped) or has a
+            // non-default name. Either way, dropping the parent
+            // table will surface a real failure if there's still an
+            // active reference.
+        }
+    }
+
+    /**
+     * Re-attach the FK on the pivot to the freshly-created identity
+     * table. Wrapped in try/catch so a re-deploy that already has
+     * the FK in place doesn't fail.
+     */
+    private function reattachPivotFk(): void
+    {
+        if (! Schema::hasTable('newsroom_subscriptions')) {
+            return;
+        }
+        if (! Schema::hasColumn('newsroom_subscriptions', 'newsroom_subscriber_id')) {
+            return;
+        }
+
+        try {
+            Schema::table('newsroom_subscriptions', function (Blueprint $table) {
+                $table->foreign('newsroom_subscriber_id')
+                    ->references('id')->on('newsroom_subscribers')
+                    ->cascadeOnDelete();
+            });
+        } catch (\Throwable $e) {
+            // FK already present (re-deploy idempotency) — nothing
+            // to do.
+        }
     }
 };
