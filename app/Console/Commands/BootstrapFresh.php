@@ -20,7 +20,7 @@ use Laravel\Jetstream\Jetstream;
  *  - manager@prcomet.com  → super-admin, owns a team with full demo data
  *    seeded (Aurelian + matches + library + one-pager + Observatory with
  *    LLM mode enabled). Use this to sweep the app from the operator side
- *    and to impersonate the others from /admin.
+ *    and to impersonate the others from /manage.
  *
  *  - customer@prcomet.com → regular user, owns a team with full demo data
  *    AND the LLM observatory upgrade ON. Mirrors a paying customer's view
@@ -161,8 +161,8 @@ class BootstrapFresh extends Command
         }
 
         $this->newLine();
-        $this->line('Sign in at <fg=yellow>/login</>. The admin panel is at <fg=yellow>/admin</>.');
-        $this->line('From /admin/users you can impersonate the other test accounts to see what they see.');
+        $this->line('Sign in at <fg=yellow>/login</>. The operator panel is at <fg=yellow>/manage</>.');
+        $this->line('From /manage/users you can impersonate the other test accounts to see what they see.');
         $this->newLine();
     }
 }

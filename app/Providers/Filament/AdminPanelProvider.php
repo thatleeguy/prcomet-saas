@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Widgets\LatestDemoRequests;
+use App\Filament\Widgets\LlmSpendOverview;
 use App\Filament\Widgets\MatchActivityChart;
 use App\Filament\Widgets\MatchQuality;
 use App\Filament\Widgets\PlatformOverview;
@@ -27,10 +28,14 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
+            // Panel id stays "admin" so generated route names (eg
+            // filament.admin.resources.users.index) and the Filament cache
+            // keys don't shift across the rename. Only the public URL
+            // changes — /admin → /manage — to match the operator brand.
             ->id('admin')
-            ->path('admin')
+            ->path('manage')
             ->login()
-            ->brandName('PrComet · admin')
+            ->brandName('PrComet · manage')
             ->colors([
                 'primary' => Color::Indigo,
             ])
@@ -42,6 +47,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 PlatformOverview::class,
+                LlmSpendOverview::class,
                 MatchQuality::class,
                 MatchActivityChart::class,
                 LatestDemoRequests::class,

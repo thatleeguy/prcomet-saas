@@ -6,10 +6,10 @@
 - Team: **{{ $team->name }}**
 - Signed up: {{ $team->created_at->toDayDateTimeString() }}
 
-Head to the admin panel to activate them and set their seat limit.
+Head to /manage to activate them and set their seat limit.
 
-<x-mail::button :url="url('/admin/teams/' . $team->id . '/edit')">
-Open team in admin
+<x-mail::button :url="url('/manage/teams/' . $team->id . '/edit')">
+Open team in /manage
 </x-mail::button>
 
 Thanks,<br>

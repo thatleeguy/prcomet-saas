@@ -25,7 +25,7 @@ class UserForm
 
                 Toggle::make('is_admin')
                     ->label('Super-admin')
-                    ->helperText('Grants access to the /admin panel. Use sparingly.'),
+                    ->helperText('Grants access to the /manage panel. Use sparingly.'),
 
                 Select::make('digest_frequency')
                     ->label('Digest cadence')

@@ -42,6 +42,12 @@ class MatchBriefPrompt
             'model' => config('services.anthropic.high_stakes_model', 'claude-opus-4-7'),
             'max_tokens' => 4000,
             'temperature' => 0,
+            // _context flows through the AnthropicLlmClient into the
+            // operator ledger — team_id drives per-team soft alerts.
+            '_context' => [
+                'feature' => \App\Models\LlmUsageEvent::FEATURE_MATCH_BRIEF,
+                'team_id' => $release->company?->team_id,
+            ],
         ]);
 
         return self::parse($raw, $candidates);

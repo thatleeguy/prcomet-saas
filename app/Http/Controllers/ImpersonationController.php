@@ -41,6 +41,6 @@ class ImpersonationController extends Controller
 
         Auth::login($admin);
 
-        return redirect('/admin');
+        return redirect('/manage');
     }
 }

@@ -50,7 +50,19 @@ class GenerateMatchesForReleaseJob implements ShouldQueue
             return;
         }
 
-        $picks = MatchBriefPrompt::run($llm, $release, $candidates);
+        try {
+            $picks = MatchBriefPrompt::run($llm, $release, $candidates);
+        } catch (\App\Services\Llm\BudgetExceededException $e) {
+            // System LLM cap reached — skip brief generation. The
+            // upstream candidate set is still useful for later retry
+            // once the budget window rolls; just don't create matches
+            // with hallucinated scores in the meantime.
+            Log::info('Match brief skipped — LLM budget exceeded', [
+                'press_release_id' => $release->id,
+                'window' => $e->window,
+            ]);
+            return;
+        }
 
         $minConfidence = (float) config('match.min_confidence', 0.5);
 

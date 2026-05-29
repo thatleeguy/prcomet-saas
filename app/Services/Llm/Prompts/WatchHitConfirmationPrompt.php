@@ -35,6 +35,12 @@ class WatchHitConfirmationPrompt
             'model' => config('services.anthropic.default_model', 'claude-sonnet-4-6'),
             'max_tokens' => 200,
             'temperature' => 0,
+            // Stamps the ledger row with the team that owns the watched
+            // company so per-team soft alerts know who to blame.
+            '_context' => [
+                'feature' => \App\Models\LlmUsageEvent::FEATURE_WATCH_HIT_CONFIRM,
+                'team_id' => $watch->company?->team_id,
+            ],
         ]);
 
         return self::parse($raw);

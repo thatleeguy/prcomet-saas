@@ -46,8 +46,14 @@ class ConfirmWatchHitJob implements ShouldQueue
 
         try {
             $result = WatchHitConfirmationPrompt::run($llm, $hit->watch, $hit);
+        } catch (\App\Services\Llm\BudgetExceededException $e) {
+            // Budget cap hit — leave the row pending without logging an
+            // error. The next sweep after the window rolls picks it up.
+            return;
         } catch (Throwable $e) {
-            // Soft fail — leave the row pending for the next sweep.
+            // Other failures (transient API issue, parse error, etc.)
+            // also leave the row pending — but we want them visible in
+            // the operator log so they can be diagnosed.
             report($e);
             return;
         }

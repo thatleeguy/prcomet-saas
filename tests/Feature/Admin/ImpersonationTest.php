@@ -13,7 +13,7 @@ it('returns the admin to their account when stopping impersonation', function ()
     $this->actingAs($target);
 
     post(route('impersonate.stop'))
-        ->assertRedirect('/admin');
+        ->assertRedirect('/manage');
 
     expect(auth()->id())->toBe($admin->id);
     expect(session('impersonator_id'))->toBeNull();

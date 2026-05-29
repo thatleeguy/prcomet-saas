@@ -19,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
         // LLM client — real Anthropic if an API key is configured, otherwise
         // the in-memory fake so dev/test environments don't accidentally hit
         // the network. Tests can also override via $this->app->instance().
-        $this->app->singleton(LlmClient::class, function () {
+        $this->app->singleton(LlmClient::class, function ($app) {
             $apiKey = (string) config('services.anthropic.api_key', '');
 
             if ($apiKey === '') {
@@ -28,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
 
             return new AnthropicLlmClient(
                 apiKey: $apiKey,
+                tracker: $app->make(\App\Services\Llm\LlmUsageTracker::class),
                 defaultModel: config('services.anthropic.default_model'),
             );
         });
