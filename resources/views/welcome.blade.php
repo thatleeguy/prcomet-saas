@@ -23,36 +23,7 @@
         {{-- ─────────────────────────────────────────────────────────────
               NAV
           ───────────────────────────────────────────────────────────── --}}
-        <header class="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-slate-200/60">
-            <div class="max-w-7xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
-                <a href="/" class="flex items-center gap-2.5">
-                    <span class="h-7 w-7 rounded-full bg-slate-900"></span>
-                    <span class="font-semibold text-slate-900 tracking-tight">PrComet</span>
-                </a>
-
-                <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
-                    <a href="#how" class="hover:text-slate-900 transition-colors">How it works</a>
-                    <a href="#brief" class="hover:text-slate-900 transition-colors">The brief</a>
-                    <a href="#send" class="hover:text-slate-900 transition-colors">The send</a>
-                    <a href="#for-whom" class="hover:text-slate-900 transition-colors">Who it's for</a>
-                </nav>
-
-                <div class="flex items-center gap-2">
-                    @auth
-                        <a href="{{ url('/dashboard') }}" class="hidden sm:inline-flex items-center px-3.5 py-1.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors">
-                            Open dashboard →
-                        </a>
-                    @else
-                        <a href="{{ route('login') }}" class="hidden sm:inline-flex items-center px-3.5 py-1.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors">
-                            Sign in
-                        </a>
-                    @endauth
-                    <a href="#request-demo" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium transition-colors">
-                        Request a demo
-                    </a>
-                </div>
-            </div>
-        </header>
+        <x-site-nav />
 
         {{-- ─────────────────────────────────────────────────────────────
               HERO

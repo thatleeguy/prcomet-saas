@@ -35,6 +35,12 @@
 }
 
 @layer components {
+    /* Active item in an article's on-page index (scrollspy). The combined
+       selector outranks the idle text-slate utility on the link. */
+    .toc-link.toc-active {
+        @apply text-indigo-700 border-indigo-500 font-medium;
+    }
+
     /* Status pill — variants applied via background/text utility classes. */
     .badge {
         @apply inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium;

@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
 // Public one-pager. UUID-keyed; published-only renders. Tracking happens in the controller.
 Route::get('/onepagers/{uuid}', [\App\Http\Controllers\OnePagerController::class, 'show'])
@@ -23,6 +23,21 @@ Route::get('/onepagers/{uuid}', [\App\Http\Controllers\OnePagerController::class
 // Slug-keyed; 404s when newsroom_published is false.
 Route::get('/newsroom/{company}', [\App\Http\Controllers\NewsroomController::class, 'show'])
     ->name('newsroom.show');
+
+// Public articles — SEO-first marketing/education blog. The /topic/ route is
+// declared before the slug route so "topic" isn't captured as an article slug.
+Route::get('/articles', [\App\Http\Controllers\ArticleController::class, 'index'])
+    ->name('articles.index');
+Route::get('/articles/topic/{topic}', [\App\Http\Controllers\ArticleController::class, 'topic'])
+    ->name('articles.topic');
+Route::get('/articles/{article}', [\App\Http\Controllers\ArticleController::class, 'show'])
+    ->name('articles.show');
+
+// SEO crawl surfaces.
+Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])
+    ->name('sitemap');
+Route::get('/robots.txt', [\App\Http\Controllers\SitemapController::class, 'robots'])
+    ->name('robots');
 
 // Subscriber self-manage surface. Token-based, no password — Substack style.
 // Token reveals subscription preferences only for that one identity.
