@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <x-articles.head
-    title="The Angle — PrComet"
-    description="The Angle — guides, playbooks, and field notes on PR discovery from the PrComet team."
+    title="The Angle · PrComet"
+    description="The Angle: guides, playbooks, and field notes on PR discovery from the PrComet team."
     :canonical="route('articles.index')"
 />
 <body class="font-sans antialiased text-slate-900 bg-white">
@@ -103,6 +103,6 @@
         @endif
     </main>
 
-    <x-articles.footer />
+    <x-site-footer />
 </body>
 </html>

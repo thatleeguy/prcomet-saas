@@ -15,7 +15,7 @@ class ArticleSeeder extends Seeder
 
             // firstOrCreate keyed on the slug: idempotent (no duplicates if this
             // reruns on deploy) and it will NOT overwrite edits made later in the
-            // admin — existing rows are returned untouched.
+            // admin, existing rows are returned untouched.
             Article::firstOrCreate(
                 ['slug' => $data['slug']],
                 array_merge($data, [
@@ -29,7 +29,7 @@ class ArticleSeeder extends Seeder
 
     /**
      * Marketing/education articles. Authored to be genuinely useful and
-     * publishable — heavy on H2/H3 structure so the on-page index has
+     * publishable, heavy on H2/H3 structure so the on-page index has
      * something to build from.
      */
     private function articles(): array
@@ -41,20 +41,20 @@ class ArticleSeeder extends Seeder
                 'title' => 'What Is PR Discovery (and Why It Beats Spray-and-Pray Outreach)',
                 'category' => 'Fundamentals',
                 'tags' => ['pr', 'strategy', 'discovery'],
-                'excerpt' => 'PR discovery starts with the story and works outward to the few journalists it genuinely fits — the opposite of blasting a media list. Here is how the model works, and why it earns more coverage with far less volume.',
+                'excerpt' => 'PR discovery starts with the story and works outward to the few journalists it genuinely fits, the opposite of blasting a media list. Here is how the model works, and why it earns more coverage with far less volume.',
                 'meta_description' => 'PR discovery finds the handful of journalists your story genuinely fits, instead of blasting a media list. Here is how the model works and why it wins.',
                 'body_md' => <<<'MD'
-Most PR advice still begins in the same place: build a media list, write a press release, and send it to as many reporters as you can find. PR discovery starts somewhere else entirely — with the story, and the question of who is *already* writing about things adjacent to it.
+Most PR advice still begins in the same place: build a media list, write a press release, and send it to as many reporters as you can find. PR discovery starts somewhere else entirely, with the story, and the question of who is *already* writing about things adjacent to it.
 
 It is a small shift in starting point that changes almost everything downstream.
 
 ## The media list is the wrong starting point
 
-A media list is a snapshot of contacts that felt relevant whenever it was last built. The problem is that relevance is not a property of a person — it is a property of the match between your story and what that person is working on *right now*.
+A media list is a snapshot of contacts that felt relevant whenever it was last built. The problem is that relevance is not a property of a person, it is a property of the match between your story and what that person is working on *right now*.
 
 ### Why volume quietly backfires
 
-Sending the same pitch to hundreds of reporters feels productive. It rarely is. The open rates are low, the reply rates are lower, and each irrelevant pitch teaches a journalist to associate your name with noise. The next time you reach out — even with something genuinely on-topic — you are starting from a deficit.
+Sending the same pitch to hundreds of reporters feels productive. It rarely is. The open rates are low, the reply rates are lower, and each irrelevant pitch teaches a journalist to associate your name with noise. The next time you reach out, even with something genuinely on-topic, you are starting from a deficit.
 
 Volume does not just fail to work. It actively spends down the goodwill you will need later.
 
@@ -68,11 +68,11 @@ Discovery inverts the order of operations. Instead of starting with a list of pe
 
 ### Start with signal, not contacts
 
-The raw material of discovery is published work: the articles, podcast episodes, and newsletters going out in your space this week. Somewhere in that stream are a few writers whose recent work overlaps with your announcement. Those overlaps are the signal. They tell you not just *who* might care, but *why they might care now* — which is exactly the context a good pitch needs.
+The raw material of discovery is published work: the articles, podcast episodes, and newsletters going out in your space this week. Somewhere in that stream are a few writers whose recent work overlaps with your announcement. Those overlaps are the signal. They tell you not just *who* might care, but *why they might care now*, which is exactly the context a good pitch needs.
 
 ### Let relevance set the volume
 
-When relevance is high, you need very little volume. Ten well-matched, well-reasoned pitches will almost always outperform a thousand generic ones — not because ten is a magic number, but because each of the ten arrives with a reason to exist. The reporter can see, in the first sentence, why this landed in their inbox specifically.
+When relevance is high, you need very little volume. Ten well-matched, well-reasoned pitches will almost always outperform a thousand generic ones, not because ten is a magic number, but because each of the ten arrives with a reason to exist. The reporter can see, in the first sentence, why this landed in their inbox specifically.
 
 ## The anatomy of a discovery-led pitch
 
@@ -88,7 +88,7 @@ The difference a reader feels is *respect for their time*. That is the entire ga
 
 You do not need a platform to begin practicing discovery. Pick your most recent piece of news and ask: who has written something in the last month that this would be relevant to? Read their actual work. Find the specific sentence your story connects to. Write to that.
 
-Discovery is a habit before it is a tool. Build the habit, and every pitch you send gets sharper — and every tool you adopt later has something real to amplify.
+Discovery is a habit before it is a tool. Build the habit, and every pitch you send gets sharper, and every tool you adopt later has something real to amplify.
 MD,
             ],
             [
@@ -100,7 +100,7 @@ MD,
                 'excerpt' => 'Finding the right reporter is not about a bigger database. It is about reading recent work, mapping beats, and matching your angle to what someone is already chasing. A repeatable method you can run for every story.',
                 'meta_description' => 'A repeatable method for finding the right journalist for your story: define the angle, build a shortlist from recent work, then qualify for relevance and reach.',
                 'body_md' => <<<'MD'
-"Who should we pitch?" is the wrong first question. The right one is "what is the story, exactly?" — because the answer determines everyone you should be talking to. Here is a method you can run for any announcement, in roughly an hour.
+"Who should we pitch?" is the wrong first question. The right one is "what is the story, exactly?", because the answer determines everyone you should be talking to. Here is a method you can run for any announcement, in roughly an hour.
 
 ## Define the story before the search
 
@@ -116,11 +116,11 @@ Name the audience that has a reason to care this week, and the reason. "Operatio
 
 ## Build a shortlist from recent work
 
-With the angle defined, you are looking for writers whose recent output overlaps it — not whose title sounds related.
+With the angle defined, you are looking for writers whose recent output overlaps it, not whose title sounds related.
 
 ### Read the last 30 days, not the masthead
 
-A reporter's job title tells you what they were hired to cover. Their last month of bylines tells you what they are *actually* covering. Read the recent work. You are looking for someone circling your topic, your sector, or your specific angle — ideally all three.
+A reporter's job title tells you what they were hired to cover. Their last month of bylines tells you what they are *actually* covering. Read the recent work. You are looking for someone circling your topic, your sector, or your specific angle, ideally all three.
 
 ### Look for the follow-up pattern
 
@@ -140,7 +140,7 @@ Is there a credible way to reach this person, and is now a sensible time? A repo
 
 ## Keep the list alive
 
-The output of this process is not a permanent list — it is a list *for this story*. Beats move, so the right people for your next announcement will be partly different. Treat discovery as something you re-run, not something you file away. The companies that consistently land coverage are the ones who keep reading, every cycle, and let the shortlist change with the news.
+The output of this process is not a permanent list, it is a list *for this story*. Beats move, so the right people for your next announcement will be partly different. Treat discovery as something you re-run, not something you file away. The companies that consistently land coverage are the ones who keep reading, every cycle, and let the shortlist change with the news.
 MD,
             ],
             [
@@ -149,7 +149,7 @@ MD,
                 'title' => 'Writing a Press Brief That Actually Earns a Reply',
                 'category' => 'Playbooks',
                 'tags' => ['writing', 'briefs', 'pitching'],
-                'excerpt' => 'A strong brief does the reporter\'s thinking for them: the angle up front, proof they can verify, and one easy next step. The structure that consistently gets replies — and the habits that kill them.',
+                'excerpt' => 'A strong brief does the reporter\'s thinking for them: the angle up front, proof they can verify, and one easy next step. The structure that consistently gets replies, and the habits that kill them.',
                 'meta_description' => 'Write a press brief that earns replies: lead with the angle, make every claim checkable, respect the inbox, and close with one easy next step.',
                 'body_md' => <<<'MD'
 The brief is the product. You can do flawless discovery and still get ignored if the email that lands does not, in its first few lines, make the reporter's job easier. A good brief does their thinking for them.
@@ -160,7 +160,7 @@ Reporters do not care that you did a thing. They care why the thing matters, to 
 
 ### The "so what" test
 
-Read your first sentence and ask "so what?" If a stranger could not tell why this matters from that sentence alone, it is not ready. "We raised $20M" fails the test. "We raised $20M to bring same-day diagnostics to rural clinics that currently wait two weeks" passes — there is a stake, a who, and a change.
+Read your first sentence and ask "so what?" If a stranger could not tell why this matters from that sentence alone, it is not ready. "We raised $20M" fails the test. "We raised $20M to bring same-day diagnostics to rural clinics that currently wait two weeks" passes, there is a stake, a who, and a change.
 
 ## Make every claim checkable
 
@@ -172,7 +172,7 @@ Trust is built on verifiability. A brief full of adjectives reads like marketing
 
 ### Quotes worth quoting
 
-Write the quote you would actually want to read in the finished piece — specific, human, and free of corporate hedging. A quote that says something real saves the reporter a step and makes the story easier to write. A quote that says "we are thrilled to announce" gets cut every time.
+Write the quote you would actually want to read in the finished piece, specific, human, and free of corporate hedging. A quote that says something real saves the reporter a step and makes the story easier to write. A quote that says "we are thrilled to announce" gets cut every time.
 
 ## Respect the inbox
 
@@ -197,10 +197,10 @@ MD,
                 'title' => 'Reading a Reporter\'s Beat: The Signals That Predict Coverage',
                 'category' => 'Strategy',
                 'tags' => ['research', 'beats', 'signals'],
-                'excerpt' => 'Beats shift constantly. These are the observable signals — recency, angle, stance, and track record — that tell you whether a writer will actually engage with your story this week, not just whether they cover your industry.',
-                'meta_description' => 'Four observable signals — recency, angle, stance, and track record — that predict whether a journalist will actually cover your story, not just whether they cover your industry.',
+                'excerpt' => 'Beats shift constantly. These are the observable signals, recency, angle, stance, and track record, that tell you whether a writer will actually engage with your story this week, not just whether they cover your industry.',
+                'meta_description' => 'Four observable signals, recency, angle, stance, and track record, that predict whether a journalist will actually cover your story, not just whether they cover your industry.',
                 'body_md' => <<<'MD'
-"They cover our industry" is the weakest possible reason to pitch someone. Industries are enormous; attention is narrow. To predict whether a specific writer will engage with a specific story, you have to read their beat the way they actually work it — through observable signals, not job titles.
+"They cover our industry" is the weakest possible reason to pitch someone. Industries are enormous; attention is narrow. To predict whether a specific writer will engage with a specific story, you have to read their beat the way they actually work it, through observable signals, not job titles.
 
 ## A beat is a moving target
 
@@ -216,11 +216,11 @@ The single strongest signal is what someone published in the last few weeks. A t
 
 ### Angle: the frame they keep returning to
 
-Writers have frames — the recurring lens through which they approach a topic. One reporter covers AI through the labor-market frame; another through the infrastructure-cost frame; another through the regulation frame. Your story can be a perfect fit for one frame and irrelevant to another. Identify the frame, then ask whether your angle fits it.
+Writers have frames, the recurring lens through which they approach a topic. One reporter covers AI through the labor-market frame; another through the infrastructure-cost frame; another through the regulation frame. Your story can be a perfect fit for one frame and irrelevant to another. Identify the frame, then ask whether your angle fits it.
 
 ### Stance: skeptic, booster, or analyst
 
-Read for posture. Some writers are skeptics who pressure-test claims; some are enthusiasts who amplify what excites them; some are analysts who contextualize. None is "better" — but the stance tells you how to pitch. A skeptic wants evidence and a falsifiable claim. An analyst wants the trend your story fits into. Misreading stance is how a strong story gets a cold reception.
+Read for posture. Some writers are skeptics who pressure-test claims; some are enthusiasts who amplify what excites them; some are analysts who contextualize. None is "better", but the stance tells you how to pitch. A skeptic wants evidence and a falsifiable claim. An analyst wants the trend your story fits into. Misreading stance is how a strong story gets a cold reception.
 
 ### Track record: do they follow up?
 
@@ -228,7 +228,7 @@ Look at whether the writer returns to stories. A reporter who has historically f
 
 ## Putting the signals together
 
-No single signal is decisive. The strongest matches light up on several at once: a recent piece (recency), in a frame your angle fits (angle), from someone whose posture suits your evidence (stance), who tends to follow threads (track record). When several align, you are not guessing — you are reading.
+No single signal is decisive. The strongest matches light up on several at once: a recent piece (recency), in a frame your angle fits (angle), from someone whose posture suits your evidence (stance), who tends to follow threads (track record). When several align, you are not guessing, you are reading.
 
 ## Signals you can safely ignore
 
@@ -241,8 +241,8 @@ MD,
                 'title' => 'Measuring PR That Matters: Beyond Impressions',
                 'category' => 'Fundamentals',
                 'tags' => ['measurement', 'analytics', 'reporting'],
-                'excerpt' => 'Impressions are easy to count and easy to game. These are the metrics that actually tell you whether your PR is moving the narrative — and a simple scorecard for tracking them month over month.',
-                'meta_description' => 'Move past impressions. The PR metrics that matter — share of voice, message pull-through, placement quality — and a simple monthly scorecard to track them.',
+                'excerpt' => 'Impressions are easy to count and easy to game. These are the metrics that actually tell you whether your PR is moving the narrative, and a simple scorecard for tracking them month over month.',
+                'meta_description' => 'Move past impressions. The PR metrics that matter, share of voice, message pull-through, placement quality, and a simple monthly scorecard to track them.',
                 'body_md' => <<<'MD'
 Impressions make decks look impressive and tell you almost nothing. A number in the millions feels like impact, but it rarely connects to anything you actually care about. Here is what to measure instead, and how to build a loop around it.
 
@@ -256,7 +256,7 @@ A mention that reaches a million people who will never become customers, partner
 
 ### The vanity-metric trap
 
-Metrics that always go up and never force a decision are vanity metrics. If a number cannot be bad — if there is no version of the report where it tells you to change course — it is not informing your strategy, it is decorating it. Impressions almost always fail this test.
+Metrics that always go up and never force a decision are vanity metrics. If a number cannot be bad, if there is no version of the report where it tells you to change course, it is not informing your strategy, it is decorating it. Impressions almost always fail this test.
 
 ## Metrics worth tracking
 
@@ -264,11 +264,11 @@ Good PR metrics tie coverage to outcomes you can influence and decisions you can
 
 ### Share of voice on your terms
 
-Measure your share of coverage on the specific topics you want to own — not the entire category. "Share of voice in same-day diagnostics" is actionable. "Share of voice in healthcare" is too broad to mean anything. Define the narrow territory you are trying to win, then track your slice of it.
+Measure your share of coverage on the specific topics you want to own, not the entire category. "Share of voice in same-day diagnostics" is actionable. "Share of voice in healthcare" is too broad to mean anything. Define the narrow territory you are trying to win, then track your slice of it.
 
 ### Message pull-through
 
-Did the coverage carry your actual message, or just your name? Pull-through asks whether the framing you offered survived into the published piece. High name recognition with zero message pull-through means you are visible but not understood — a fixable problem you would never see from impression counts.
+Did the coverage carry your actual message, or just your name? Pull-through asks whether the framing you offered survived into the published piece. High name recognition with zero message pull-through means you are visible but not understood, a fixable problem you would never see from impression counts.
 
 ### Quality of placement
 
@@ -293,14 +293,14 @@ MD,
                 'title' => 'The Follow-Up: Timing, Cadence, and Knowing When to Stop',
                 'category' => 'Playbooks',
                 'tags' => ['follow-up', 'outreach', 'etiquette'],
-                'excerpt' => 'Most pitches die in the follow-up — sent too soon, too often, or never at all. A practical framework for following up in a way reporters actually appreciate, and knowing the difference between persistence and pestering.',
+                'excerpt' => 'Most pitches die in the follow-up, sent too soon, too often, or never at all. A practical framework for following up in a way reporters actually appreciate, and knowing the difference between persistence and pestering.',
                 'meta_description' => 'A practical framework for the PR follow-up: when to send the first nudge, what it should say, how to set cadence without nagging, and when to stop.',
                 'body_md' => <<<'MD'
-A surprising number of pitches that *should* land never do — not because the story was wrong, but because the follow-up was. It came too soon, too often, repeated the original word for word, or never came at all. The follow-up is a skill of its own.
+A surprising number of pitches that *should* land never do, not because the story was wrong, but because the follow-up was. It came too soon, too often, repeated the original word for word, or never came at all. The follow-up is a skill of its own.
 
 ## The follow-up is where most pitches are won or lost
 
-Reporters are busy and inboxes are deep. A first email that does not get a reply has very often simply not been *seen* yet, not actively rejected. That makes the follow-up not an act of desperation but a normal, expected part of the process — if you do it well.
+Reporters are busy and inboxes are deep. A first email that does not get a reply has very often simply not been *seen* yet, not actively rejected. That makes the follow-up not an act of desperation but a normal, expected part of the process, if you do it well.
 
 ## Timing the first nudge
 
@@ -312,7 +312,7 @@ If you can tell that your brief was opened or your linked page was viewed, you h
 
 ### The 3-to-5 day window
 
-Absent any signal, a few business days is a reasonable default for the first follow-up — long enough to clear a normal triage backlog, short enough that the news is still timely. Adjust for the rhythm of the story: a hard-news angle decays in days, an evergreen trend piece can wait a week.
+Absent any signal, a few business days is a reasonable default for the first follow-up, long enough to clear a normal triage backlog, short enough that the news is still timely. Adjust for the rhythm of the story: a hard-news angle decays in days, an evergreen trend piece can wait a week.
 
 ## What a good follow-up says
 
@@ -336,7 +336,7 @@ If a story has gone quiet after a thoughtful pitch and a thoughtful follow-up, l
 
 ## Turning a no into a next time
 
-The goal is never a single placement — it is a relationship that produces placements over years. A graceful "no problem, I'll keep you in mind for something more relevant" does more for your long-term coverage than one more aggressive bump ever could. Play for the next story, not just this one.
+The goal is never a single placement, it is a relationship that produces placements over years. A graceful "no problem, I'll keep you in mind for something more relevant" does more for your long-term coverage than one more aggressive bump ever could. Play for the next story, not just this one.
 MD,
             ],
         ];

@@ -45,7 +45,7 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <x-articles.head
-    :title="$metaTitle . ' — PrComet'"
+    :title="$metaTitle . ' · PrComet'"
     :description="$metaDescription"
     :canonical="$canonical"
     :image="$ogImage"
@@ -155,7 +155,7 @@
         @endif
     </div>
 
-    <x-articles.footer />
+    <x-site-footer />
 
     {{-- Scrollspy: highlight the on-page index item for the section in view. --}}
     <script>

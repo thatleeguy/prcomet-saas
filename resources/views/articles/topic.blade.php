@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <x-articles.head
-    :title="$topic . ' — The Angle'"
+    :title="$topic . ' · The Angle'"
     :description="$topic . ' articles from The Angle, PrComet\'s field guide to PR discovery.'"
     :canonical="route('articles.topic', $topic)"
 />
@@ -57,6 +57,6 @@
         </div>
     </main>
 
-    <x-articles.footer />
+    <x-site-footer />
 </body>
 </html>

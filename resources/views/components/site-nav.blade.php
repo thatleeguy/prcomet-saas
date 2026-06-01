@@ -10,6 +10,14 @@
     $navCategories = $showAngle
         ? \App\Models\Article::published()->whereNotNull('category')->distinct()->orderBy('category')->pluck('category')
         : collect();
+
+    // Industry landing pages surfaced under "Who it's for".
+    $navIndustries = [
+        ['route' => 'industries.junior-mining', 'label' => 'Junior Mining', 'blurb' => 'Drill results & financings'],
+        ['route' => 'industries.manufacturing', 'label' => 'Manufacturing', 'blurb' => 'Expansions & contracts'],
+        ['route' => 'industries.tourism-councils', 'label' => 'Tourism Councils', 'blurb' => 'Festivals & destinations'],
+        ['route' => 'industries.municipalities', 'label' => 'Municipalities', 'blurb' => 'Civic news & projects'],
+    ];
 @endphp
 
 <header class="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-slate-200/60">
@@ -24,7 +32,39 @@
             <a href="{{ route('home') }}#how" class="hover:text-slate-900 transition-colors">How it works</a>
             <a href="{{ route('home') }}#brief" class="hover:text-slate-900 transition-colors">The brief</a>
             <a href="{{ route('home') }}#send" class="hover:text-slate-900 transition-colors">The send</a>
-            <a href="{{ route('home') }}#for-whom" class="hover:text-slate-900 transition-colors">Who it's for</a>
+
+            {{-- Who it's for — industry dropdown. CSS-only (hover + focus-within). --}}
+            <div class="group relative">
+                <a href="{{ route('home') }}#for-whom"
+                   class="inline-flex items-center gap-1 hover:text-slate-900 group-hover:text-slate-900 transition-colors">
+                    Who it's for
+                    <svg class="h-3.5 w-3.5 text-slate-400 transition-transform duration-150 group-hover:rotate-180"
+                         fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </a>
+
+                <div class="absolute left-1/2 top-full -translate-x-1/2 pt-3 w-[26rem] max-w-[calc(100vw-2rem)]
+                            invisible translate-y-1 opacity-0
+                            group-hover:visible group-hover:translate-y-0 group-hover:opacity-100
+                            focus-within:visible focus-within:translate-y-0 focus-within:opacity-100
+                            transition duration-150 ease-out">
+                    <div class="rounded-2xl border border-slate-200 bg-white shadow-xl overflow-hidden">
+                        <div class="h-1 bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600"></div>
+                        <div class="p-3">
+                            <p class="px-3 pt-1 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">PrComet for your industry</p>
+                            <div class="grid grid-cols-2 gap-1">
+                                @foreach($navIndustries as $ind)
+                                    <a href="{{ route($ind['route']) }}" class="block rounded-lg px-3 py-2 hover:bg-slate-50">
+                                        <div class="text-sm font-medium text-slate-900">{{ $ind['label'] }}</div>
+                                        <div class="text-xs text-slate-500">{{ $ind['blurb'] }}</div>
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             @if($showAngle)
                 {{-- The Angle — multi-column mega-menu. CSS-only (hover + focus-within). --}}
@@ -130,7 +170,16 @@
             <a href="{{ route('home') }}#how" class="block rounded-lg px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50">How it works</a>
             <a href="{{ route('home') }}#brief" class="block rounded-lg px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50">The brief</a>
             <a href="{{ route('home') }}#send" class="block rounded-lg px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50">The send</a>
-            <a href="{{ route('home') }}#for-whom" class="block rounded-lg px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50">Who it's for</a>
+
+            <div class="pt-3 mt-2 border-t border-slate-100">
+                <a href="{{ route('home') }}#for-whom" class="block px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-slate-400 hover:text-slate-600">Who it's for</a>
+                @foreach($navIndustries as $ind)
+                    <a href="{{ route($ind['route']) }}" class="block rounded-lg px-3 py-2 hover:bg-slate-50">
+                        <span class="text-sm font-medium text-slate-900">{{ $ind['label'] }}</span>
+                        <span class="block text-xs text-slate-500">{{ $ind['blurb'] }}</span>
+                    </a>
+                @endforeach
+            </div>
 
             @if($showAngle)
                 <div class="pt-3 mt-2 border-t border-slate-100">

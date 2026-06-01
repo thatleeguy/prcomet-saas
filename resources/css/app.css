@@ -41,6 +41,28 @@
         @apply text-indigo-700 border-indigo-500 font-medium;
     }
 
+    /* Scroll-reveal: elements fade/rise into view as they enter the viewport.
+       Marked up with [data-reveal]; a tiny IntersectionObserver adds
+       .is-revealed. Falls back to fully visible if JS or motion is off. */
+    [data-reveal] {
+        @apply opacity-0 translate-y-4;
+        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        will-change: opacity, transform;
+    }
+    [data-reveal].is-revealed {
+        @apply opacity-100 translate-y-0;
+    }
+    /* Animated chart line: "draws" itself in when its revealing section
+       enters view. pathLength="1" normalizes the dash math across shapes. */
+    .chart-draw { stroke-dasharray: 1; stroke-dashoffset: 0; }
+    [data-reveal].is-revealed .chart-draw { animation: chartDraw 1.6s ease-out 0.15s; }
+    @keyframes chartDraw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+    @media (prefers-reduced-motion: reduce) {
+        [data-reveal] { @apply opacity-100 translate-y-0; transition: none; }
+        .chart-draw { animation: none; stroke-dashoffset: 0; }
+    }
+
     /* Status pill — variants applied via background/text utility classes. */
     .badge {
         @apply inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium;

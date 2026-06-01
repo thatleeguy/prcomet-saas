@@ -36,9 +36,25 @@ class DemoRequestForm extends Component
 
     public bool $submitted = false;
 
+    /**
+     * Optional offering/segment label (e.g. an industry name). When set, it's
+     * tagged into the saved notes so these leads are distinguishable in the
+     * admin without needing a dedicated column. Not part of validated input.
+     */
+    public ?string $source = null;
+
+    public function mount(?string $source = null): void
+    {
+        $this->source = $source;
+    }
+
     public function submit(): void
     {
         $data = $this->validate();
+
+        if ($this->source) {
+            $data['notes'] = trim('['.$this->source.'] '.$data['notes']);
+        }
 
         DemoRequest::create($data + ['status' => DemoRequest::STATUS_NEW]);
 

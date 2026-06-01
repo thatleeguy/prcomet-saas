@@ -33,6 +33,18 @@ Route::get('/articles/topic/{topic}', [\App\Http\Controllers\ArticleController::
 Route::get('/articles/{article}', [\App\Http\Controllers\ArticleController::class, 'show'])
     ->name('articles.show');
 
+// Industry landing pages — "PrComet for {industry}". SEO-first marketing pages,
+// hand-built per vertical under the /for namespace; convert via the demo form.
+Route::view('/for/junior-mining-companies', 'industries.junior-mining')->name('industries.junior-mining');
+Route::view('/for/manufacturing-companies', 'industries.manufacturing')->name('industries.manufacturing');
+Route::view('/for/tourism-councils', 'industries.tourism-councils')->name('industries.tourism-councils');
+Route::view('/for/municipalities', 'industries.municipalities')->name('industries.municipalities');
+
+// Company / legal marketing pages.
+Route::view('/about', 'pages.about')->name('about');
+Route::view('/contact', 'pages.contact')->name('contact');
+Route::view('/privacy', 'pages.privacy')->name('privacy');
+
 // SEO crawl surfaces.
 Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])
     ->name('sitemap');

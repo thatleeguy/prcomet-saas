@@ -37,6 +37,29 @@ class SitemapController extends Controller
             'priority' => '0.9',
         ];
 
+        // Industry landing pages.
+        foreach ([
+            'industries.junior-mining',
+            'industries.manufacturing',
+            'industries.tourism-councils',
+            'industries.municipalities',
+        ] as $industry) {
+            $urls[] = [
+                'loc' => route($industry),
+                'changefreq' => 'monthly',
+                'priority' => '0.8',
+            ];
+        }
+
+        // Company / legal pages.
+        foreach (['about', 'contact', 'privacy'] as $page) {
+            $urls[] = [
+                'loc' => route($page),
+                'changefreq' => 'yearly',
+                'priority' => '0.4',
+            ];
+        }
+
         foreach ($topics as $topic) {
             $urls[] = [
                 'loc' => route('articles.topic', $topic),

@@ -688,17 +688,7 @@
         {{-- ─────────────────────────────────────────────────────────────
               FOOTER
           ───────────────────────────────────────────────────────────── --}}
-        <footer class="border-t border-slate-200/70 py-8 bg-white">
-            <div class="max-w-7xl mx-auto px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
-                <div class="flex items-center gap-2">
-                    <span class="h-5 w-5 rounded-full bg-slate-900"></span>
-                    <span class="text-sm font-medium text-slate-700">PrComet</span>
-                </div>
-                <div class="text-xs text-slate-500">
-                    © {{ date('Y') }} PrComet. Discovery, not automation.
-                </div>
-            </div>
-        </footer>
+        <x-site-footer />
 
         @livewireScripts
     </body>
