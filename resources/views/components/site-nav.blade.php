@@ -171,15 +171,22 @@
             <a href="{{ route('home') }}#brief" class="block rounded-lg px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50">The brief</a>
             <a href="{{ route('home') }}#send" class="block rounded-lg px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50">The send</a>
 
-            <div class="pt-3 mt-2 border-t border-slate-100">
-                <a href="{{ route('home') }}#for-whom" class="block px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-slate-400 hover:text-slate-600">Who it's for</a>
-                @foreach($navIndustries as $ind)
-                    <a href="{{ route($ind['route']) }}" class="block rounded-lg px-3 py-2 hover:bg-slate-50">
-                        <span class="text-sm font-medium text-slate-900">{{ $ind['label'] }}</span>
-                        <span class="block text-xs text-slate-500">{{ $ind['blurb'] }}</span>
-                    </a>
-                @endforeach
-            </div>
+            <details class="nav-accordion pt-1 mt-1">
+                <summary class="flex items-center justify-between rounded-lg px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50 cursor-pointer">
+                    Who it's for
+                    <svg class="nav-accordion-chevron h-4 w-4 text-slate-400 transition-transform duration-150" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </summary>
+                <div class="mt-1 pl-3 border-l border-slate-100 ml-3">
+                    @foreach($navIndustries as $ind)
+                        <a href="{{ route($ind['route']) }}" class="block rounded-lg px-3 py-2 hover:bg-slate-50">
+                            <span class="text-sm font-medium text-slate-900">{{ $ind['label'] }}</span>
+                            <span class="block text-xs text-slate-500">{{ $ind['blurb'] }}</span>
+                        </a>
+                    @endforeach
+                </div>
+            </details>
 
             @if($showAngle)
                 <div class="pt-3 mt-2 border-t border-slate-100">

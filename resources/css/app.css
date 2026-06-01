@@ -63,6 +63,13 @@
         .chart-draw { animation: none; stroke-dashoffset: 0; }
     }
 
+    /* Mobile nav accordion (<details>): hide the native marker and flip the
+       chevron when open. Done in CSS so it doesn't depend on Tailwind's
+       group-open / arbitrary-variant generation. */
+    .nav-accordion > summary { list-style: none; }
+    .nav-accordion > summary::-webkit-details-marker { display: none; }
+    .nav-accordion[open] .nav-accordion-chevron { transform: rotate(180deg); }
+
     /* Status pill — variants applied via background/text utility classes. */
     .badge {
         @apply inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium;
